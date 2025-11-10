@@ -1,7 +1,9 @@
 ---
 title: "Unidad 02"
 subtitle: "Otras formas de medir la diversidad"
-format: html
+format:
+  html: default
+  pdf: default
 ---
 
 # Introducción

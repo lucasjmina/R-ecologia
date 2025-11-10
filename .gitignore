@@ -63,3 +63,5 @@ output/
 plots/
 
 /.quarto/
+
+**/*.quarto_ipynb

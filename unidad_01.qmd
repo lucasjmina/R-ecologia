@@ -1,7 +1,9 @@
 ---
 title: "Unidad 01"
 subtitle: "Índices para medir la diversidad biológica"
-format: html
+format:
+  html: default
+  pdf: default
 ---
 
 # Introducción

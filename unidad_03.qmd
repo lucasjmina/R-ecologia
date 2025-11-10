@@ -1,7 +1,9 @@
 ---
 title: "Unidad 03"
 subtitle: "Estudio de la estructura de la comunidad"
-format: html
+format:
+  html: default
+  pdf: default
 ---
 
 # Introducción

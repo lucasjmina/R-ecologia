@@ -1,19 +1,5 @@
 [
   {
-    "objectID": "unidad_01.html",
-    "href": "unidad_01.html",
-    "title": "Unidad 01",
-    "section": "",
-    "text": "En esta guía veremos como calcular distintos índices de diversidad alfa cómo Shannon, Simpson y diversidad verdadera. Así como estimadores: Chao, Jacknife, ACE e ICE. Se utilizaran los set de datos llamados abundancia_tratamiento.csv y abundancia_conservacion.csv\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
-  },
-  {
-    "objectID": "unidad_01.html#ace-e-ice",
-    "href": "unidad_01.html#ace-e-ice",
-    "title": "Unidad 01",
-    "section": "4.1 ACE e ICE",
-    "text": "4.1 ACE e ICE\nEstas funciones del paquete fossil calculan los estimadores para todos los sitios, por lo tanto para calcularlos por grupo debemos hacerlo manualmente.\n\nace_ice &lt;- pivot_longer(\n  datos,\n  Acanthoponera.mucronata:Gnamptogenys.sulcata,\n  values_to = \"abund\"\n) %&gt;% \n  reframe(\n    .by = estadoConservacion,\n    ACE = fossil::ACE(abund),\n    ICE = fossil::ICE(abund)\n  ) %&gt;%\n  unique()\nace_ice"
-  },
-  {
     "objectID": "unidad_04.html",
     "href": "unidad_04.html",
     "title": "Unidad 04",
@@ -75,6 +61,20 @@
     "title": "Unidad 02",
     "section": "3.3 Gráfico",
     "text": "3.3 Gráfico\n\n# Transdormamos los resultados a una data.frame\ndiv_taxonomica &lt;- as.data.frame(\n  do.call(cbind, div_taxonomica)\n)\n\nggplot(div_taxonomica, aes(x = Species, y = Dplus)) +\n  geom_point() +\n  ylab(\"Δ+\") +\n  xlab(\"Riqueza\") +\n  geom_hline(aes(yintercept = EDplus), linetype = \"dotted\") +\n  geom_ribbon(aes(ymax = EDplus + sd.Dplus * 2, ymin = EDplus - sd.Dplus * 2), fill = NA, color = \"black\") +\n  geom_text_repel(aes(label = row.names(div_taxonomica)), size = 3.5, color = \"blue3\") +\n  theme_classic()"
+  },
+  {
+    "objectID": "unidad_01.html",
+    "href": "unidad_01.html",
+    "title": "Unidad 01",
+    "section": "",
+    "text": "En esta guía veremos como calcular distintos índices de diversidad alfa cómo Shannon, Simpson y diversidad verdadera. Así como estimadores: Chao, Jacknife, ACE e ICE. Se utilizaran los set de datos llamados abundancia_tratamiento.csv y abundancia_conservacion.csv\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
+  },
+  {
+    "objectID": "unidad_01.html#ace-e-ice",
+    "href": "unidad_01.html#ace-e-ice",
+    "title": "Unidad 01",
+    "section": "4.1 ACE e ICE",
+    "text": "4.1 ACE e ICE\nEstas funciones del paquete fossil calculan los estimadores para todos los sitios, por lo tanto para calcularlos por grupo debemos hacerlo manualmente.\n\nace_ice &lt;- pivot_longer(\n  datos,\n  Acanthoponera.mucronata:Gnamptogenys.sulcata,\n  values_to = \"abund\"\n) %&gt;% \n  reframe(\n    .by = estadoConservacion,\n    ACE = fossil::ACE(abund),\n    ICE = fossil::ICE(abund)\n  ) %&gt;%\n  unique()\nace_ice"
   },
   {
     "objectID": "unidad_03.html",
