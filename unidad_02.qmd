@@ -1,0 +1,126 @@
+---
+title: "Unidad 02"
+subtitle: "Otras formas de medir la diversidad"
+format: html
+---
+
+# Introducción
+
+En esta guí se verá como calcular indices de diversidad funcional y diversidad taxonómica. Se utilizaran los sets de datos llamados `abun_hormigas.csv`, `categ_hormigas.csv`, `medidas_hormigas.csv`, `abundancia.csv` y `taxa.csv`.
+
+**NOTA**: Es recomendable que trabajen dentro de un proyecto de RStudio.
+
+# Diversidad funcional
+
+## Carga de librerias y datos
+
+```{r}
+library(tidyverse)
+library(FD)
+
+set.seed(2025)
+
+abund <- read.csv("datos/abun_hormigas.csv", header = TRUE, row.names = 1)
+medidas <- read.csv("datos/medidas_hormigas.csv", header = TRUE, row.names = 1)
+categs <- read.csv("datos/categ_hormigas.csv", header = TRUE, row.names = 1, colClasses = "factor")
+```
+
+## Análisis
+
+```{r}
+# Diversidad con variables continuas
+div_medidas <- dbFD(medidas, abund)
+
+# Diversidad con variables categoricas
+div_categs <- dbFD(categs, abund)
+
+# Tablas resumen
+tb_div_medidas <- rbind(
+  div_medidas$FRic,
+  div_medidas$FEve,
+  div_medidas$FDiv,
+  div_medidas$FDis
+) %>% as.data.frame()
+
+tb_div_medidas <- cbind(Index = c("FRic", "FEve", "FDiv", "FDis"), tb_div_medidas)
+tb_div_medidas
+
+tb_div_categs <- rbind(
+  div_categs$FRic,
+  div_categs$FEve,
+  div_categs$FDis
+) %>% as.data.frame()
+
+tb_div_categs <- cbind(Index = c("FRic", "FEve", "FDis"), tb_div_categs)
+tb_div_categs
+```
+
+En el caso de las variables categóricas no es posible calcular `FDiv` y `FRic` mide la cantidad de combinaciones únicas de rasgos.
+
+## Gráficos
+
+```{r}
+# Transformamos la tabla a formato largo para ggplot
+div_medidas_long  <- tb_div_medidas %>%
+  pivot_longer(
+    ECB:ECD,
+    names_to = "Ambiente",
+    values_to = "val"
+  )
+div_medidas_long$Ambiente <- factor(div_meas_long$Ambiente, levels = c("ECB", "ECI", "ECD"))
+
+div_medidas_plot <- ggplot(div_medidas_long, aes(x = Ambiente, y = val, fill = Ambiente)) +
+  ylab("") +
+  xlab("") +
+  geom_col(show.legend = FALSE) +
+  scale_fill_manual(values = c("#20854E", "#E18727", "#BC3C29")) +
+  scale_y_continuous(expand = c(0, 0)) +
+  facet_wrap(Index ~ ., scale = "free", axes = "all", ncol = 2, strip.position = "left") +
+  theme_classic() +
+  theme(strip.placement = "outside", strip.background = element_blank())
+div_medidas_plot
+```
+
+# Diversidad taxonómica
+
+## Carga de librerias y datos
+
+```{r}
+library(BiodiversityR)
+library(ggplot2)
+library(ggrepel)
+
+abundancia <- read.csv("datos/abundancia.csv", header = TRUE, row.names = 1)
+taxa <- read.csv("datos/taxa.csv", header = TRUE, row.names = 1)
+```
+
+## Análisis
+
+```{r}
+# Primero es necesatio crear una matriz de distancia de los taxones
+dist_taxa <- taxa2dist(taxa)
+
+# Calculo diversidad
+div_taxonomica <- taxondive(abundancia, dist_taxa)
+div_taxonomica
+```
+
+## Gráfico
+
+```{r}
+
+# Transdormamos los resultados a una data.frame
+div_taxonomica <- as.data.frame(
+  do.call(cbind, div_taxonomica)
+)
+
+ggplot(div_taxonomica, aes(x = Species, y = Dplus)) +
+  geom_point() +
+  ylab("Δ+") +
+  xlab("Riqueza") +
+  geom_hline(aes(yintercept = EDplus), linetype = "dotted") +
+  geom_ribbon(aes(ymax = EDplus + sd.Dplus * 2, ymin = EDplus - sd.Dplus * 2), fill = NA, color = "black") +
+  geom_text_repel(aes(label = row.names(div_taxonomica)), size = 3.5, color = "blue3") +
+  theme_classic()
+```
+

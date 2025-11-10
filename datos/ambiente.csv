@@ -1,0 +1,10 @@
+"localidad","estado_conservacion","ihh","t_min","t_max","t_med","hr_min","hr_max","hr_med","pp_14_dias_antes","pp_30_dias_antes","dist_al_rio"
+"Estancia El Bagual","ECI",25,17.6,35.2,26.4,33.4,99.9,66.65,98.29,163.57,31.72
+"Estancia Quintana","ECI",15,24.1,39.7,29.26,34.4,79.6,64.17,38.1,141.47,217.82
+"Estancia San Carlos","ECB",35,20.1,30.4,25.46,47,66,55.6,100.58,110.99,146.54
+"Pampa del Indio","ECD",25,23,34,26.79,49,100,82.04,50.3,139.57,39.51
+"Parque Nacional Chaco I","ECI",15,14.8,36.5,23.89,38.4,95.9,71.54,3.05,243.84,14.33
+"Parque Nacional Chaco II","ECB",15,20.2,34.8,26.32,34.1,94.5,75.88,3.05,243.84,25.38
+"Puerto Antequera","ECD",50,19,28,23.67,51.3,100,76.84,42.18,90.86,204.37
+"Reserva los Chaguares","ECB",35,23.2,34.7,29.08,30,68,47.72,48.28,106.94,92.95
+"Vedia","ECD",50,20.1,24.2,21.5,70,79,74.33,3.3,111.68,128.14

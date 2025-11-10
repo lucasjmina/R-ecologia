@@ -1,0 +1,235 @@
+---
+title: "Unidad 03"
+subtitle: "Estudio de la estructura de la comunidad"
+format: html
+---
+
+# Introducción
+
+Aquí veremos distintas formas de medir y representar la estructura de una comunidad. Se utilizaran los datasets `abundancia.csv`, `ambiente.csv`, `abundancia_conservacion.csv` y `abundancia_conservacion_02.csv`.
+
+**NOTA**: Es recomendable que trabajen dentro de un proyecto de RStudio.
+
+# Diversidad Beta
+
+## Carga de librerias y datos
+
+```{r}
+library(betapart)
+
+abundancia <- read.csv("datos/abundancia_conservacion_02.csv", header = TRUE, row.names = 1)
+```
+
+## Análisis
+
+```{r}
+# Para calcular la diversidad beta es necesario datos de incidencia
+incidencia <- ifelse(abundancia > 0, 1, 0)
+
+div_beta <- betapart.core(incidencia)
+div_beta
+```
+
+## Beta partición
+
+```{r}
+
+## En base Jaccard
+beta_jac <- beta.multi(incidencia, index.family = "jac")
+beta_jac
+
+# Distancias
+dist_jac <- beta.pair(incidencia, index.family = "jac")
+dist_jac
+
+## En base Sørensen
+beta_sor <- beta.multi(incidencia, index.family = "sor")
+beta_sor
+
+# Distancias
+dist_sor <- beta.pair(incidencia, index.family = "sor")
+dist_sor
+```
+
+# Curvas de Whitaker y acumulación
+
+## Carga de librerias y datos
+
+```{r}
+library(BiodiversityR)
+library(ggplot2)
+library(ggrepel)
+
+abundancia <- read.csv("datos/abundancia.csv", header = TRUE, row.names = 1)
+ambiente <- read.csv("datos/ambiente.csv", header = TRUE, row.names = 1)
+```
+
+## Curva de Whitaker
+
+```{r}
+# Variable categórica como factor
+ambiente$estado_conservacion <- factor(ambiente$estado_conservacion)
+
+rank_abundancia <- rankabuncomp(
+  abundancia,
+  y = ambiente,
+  factor = "estado_conservacion",
+  legend = FALSE
+)
+
+# Funcion para graficar grupos de forma independiente
+curva_whitt <- function(datos, grupo, color) {
+  x <- subset(datos, Grouping == grupo)
+  plot <- ggplot(x, aes(x = rank, y = abundance)) +
+    geom_line(color = color) +
+    geom_point(size = 2.5, color = color) +
+    labs(x = "Rank", y = "Abundancia") +
+    theme_classic()
+  plot
+}
+
+curva_whitt(rank_abundancia, "ECB", "darkgreen")
+curva_whitt(rank_abundancia, "ECI", "orange")
+curva_whitt(rank_abundancia, "ECD", "red")
+
+# Gráfico con todos los grupos
+ggplot(rank_abundancia, aes(x = rank, y = abundance, color = Grouping)) +
+  geom_line() +
+  geom_point(size = 2.5) +
+  scale_color_manual(breaks = c("ECB", "ECI", "ECD"), values = c("darkgreen", "orange", "red")) +
+  labs(x = "Rank", y = "Abundancia", color = NULL, shape = NULL) +
+  theme_classic() +
+  theme(legend.position = "top")
+```
+
+## Curvas de acumulación
+
+```{r}
+curva <- specaccum(abundancia)
+curva
+
+# Tabla resumen
+datos_sp <- data.frame(
+  Sitios = curva$sites,
+  Riqueza = curva$richness,
+  SD = curva$sd
+)
+datos_sp
+
+# Grafico
+ggplot(datos_sp, aes(x = Sitios, y = Riqueza)) +
+  geom_ribbon(aes(ymin = Riqueza - SD, ymax = Riqueza + SD), fill = "grey90") +
+  scale_x_continuous(breaks = datos_sp$Sitios) +
+  geom_line(color = "blue") +
+  theme_classic()
+```
+
+# Curvas de rarefacción
+
+## Carga de librerias y datos
+
+```{r}
+library(iNEXT)
+
+abundancia <- read.csv("datos/abundancia_conservacion.csv", header = TRUE, row.names = 1)
+```
+
+## Análisis
+
+```{r}
+rarefaccion <- iNEXT(abundancia, q = c(0, 1, 2), datatype = "abundance")
+rarefaccion
+```
+
+El argumento `q` nos permite elegir para que valores de q queremos calcular la diversidad, puede tomas cualquier valor/es. Y `datatype` nos permite elegir con que tipo de datos estamos realizando los calculos, en este caso tenemos datos de abundancia, pero también es posible usar datos de incidencia.
+
+## Gráficos
+
+```{r}
+# Gráficos por tratamiento
+plot_ec <- ggiNEXT(rarefaccion, type = 1, facet.var = "Assemblage") +
+  theme_classic(base_size = 10) +
+  theme(legend.position = "bottom")
+plot_ec
+
+# Gráficos por orden q
+plot_orderq <- ggiNEXT(rarefaccion, type = 1, facet.var = "Order.q") +
+  theme_classic(base_size = 10) +
+  theme(legend.position = "bottom")
+plot_orderq
+```
+
+# NMDS (Escalado multi-dimensional no métrico)
+
+## Carga de librerias y datos
+
+```{r}
+library(BiodiversityR)
+library(ggplot2)
+library(ggrepel)
+library(ggforce)
+library(concaveman)
+
+abundancia <- read.csv("datos/abundancia.csv", header = TRUE, row.names = 1)
+ambiente <- read.csv("datos/ambiente.csv", header = TRUE, row.names = 1)
+```
+
+## Análisis
+
+```{r}
+set.seed(2025)
+
+resultado_nmds <- metaMDS(abundancia, distance = "bray", K = 2)
+resultado_nmds
+
+# Stress
+resultado_nmds$stress
+
+# ANOSIM
+dist_sitios <- vegdist(abundancia)
+anosim_sitios <- anosim(dist_sitios, ambiente$estado_conservacion, distance = "bray")
+summary(anosim_sitios)
+```
+
+## Gráficos
+
+```{r}
+# Creamos un data.frame con los resultados
+puntos_nmds <- as.data.frame(resultado_nmds$points)
+puntos_nmds$CONSERVACION <- ambiente$estado_conservacion
+
+# Agregamos siglas para nombres de los sitios y guardamos el valor de stress
+puntos_nmds$SITIO <- abbreviate(rownames(abundancia))
+estres <- sprintf("Stress = %s", round(resultado_nmds$stress, 2))
+
+# Graficamos
+plot_nmds <- ggplot(puntos_nmds, aes(x = MDS1, y = MDS2)) +
+  ggtitle("NMDS") +
+  geom_point(aes(shape = CONSERVACION), size = 3) +
+  scale_shape_manual(
+    name = "",
+    breaks = c("ECB", "ECI", "ECD"),
+    labels = c("Conservado", "Intermedio", "Degradado"),
+    values = c(15, 16, 17)
+  ) +
+  geom_mark_hull(
+    aes(group = CONSERVACION, linetype = CONSERVACION),
+    concavity = 10,
+    radius = 0,
+    expand = 0,
+    show.legend = FALSE
+  ) +
+  scale_linetype_manual(values = c("solid", "dashed", "dotted")) +
+  annotate("text", x = +Inf, y = +Inf, label = estres, hjust = 1, vjust = 1) +
+  theme_classic()
+plot_nmds
+
+# Opcionalmente podemos añadir el nombre de los sitios
+plot_nmds +
+  geom_text_repel(
+    aes(label = SITIO),
+    box.padding = 0.5,
+    size = 3.5,
+    colour = "blue",
+  )
+```

@@ -1,0 +1,40 @@
+project:
+  type: website
+  output-dir: docs  # so GitHub Pages can use it
+website:
+  title: "R aplicado a Ecología"
+  navbar:
+    left:
+      - text: "Unidad 01"
+        href: unidad_01.qmd
+      - text: "Unidad 02"
+        href: unidad_02.qmd
+      - text: "Unidad 03"
+        href: unidad_03.qmd
+
+execute:
+  output: false
+  warning: false
+  eval: false
+date: now
+date-format: YYYY
+pdf-engine: lualatex
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    code-copy: true
+    number-sections: true
+    smooth-scroll: true
+  pdf:
+    documentclass: unne-guide
+    mainfont: Libertinus Serif
+    monofont: Adwaita Mono
+    number-sections: true
+    colorlinks: true
+    linkcolor: "005D8A"
+    include-in-header:
+      text: |
+        \usepackage{fvextra}
+        \fvset{breaklines=true, commandchars=\\\{\}, breaksymbol={}, breakindentnchars=2}
