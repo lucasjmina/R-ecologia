@@ -1,0 +1,170 @@
+[
+  {
+    "objectID": "unidad_01.html",
+    "href": "unidad_01.html",
+    "title": "Unidad 01",
+    "section": "",
+    "text": "En esta guía veremos como calcular distintos índices de diversidad alfa cómo Shannon, Simpson y diversidad verdadera. Así como estimadores: Chao, Jacknife, ACE e ICE. Se utilizaran los set de datos llamados abundancia_tratamiento.csv y abundancia_conservacion.csv\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
+  },
+  {
+    "objectID": "unidad_01.html#ace-e-ice",
+    "href": "unidad_01.html#ace-e-ice",
+    "title": "Unidad 01",
+    "section": "4.1 ACE e ICE",
+    "text": "4.1 ACE e ICE\nEstas funciones del paquete fossil calculan los estimadores para todos los sitios, por lo tanto para calcularlos por grupo debemos hacerlo manualmente.\n\nace_ice &lt;- pivot_longer(\n  datos,\n  Acanthoponera.mucronata:Gnamptogenys.sulcata,\n  values_to = \"abund\"\n) %&gt;% \n  reframe(\n    .by = estadoConservacion,\n    ACE = fossil::ACE(abund),\n    ICE = fossil::ICE(abund)\n  ) %&gt;%\n  unique()\nace_ice"
+  },
+  {
+    "objectID": "unidad_04.html",
+    "href": "unidad_04.html",
+    "title": "Unidad 04",
+    "section": "",
+    "text": "En esta guia veremos como realizar distintos análisis estadisticos utilizados para comprender como se relacionen variables ambientales con la estructura de la comunidad. Se utilizarand los sets de datos llamados moscas.csv, abundancia.csv, ambiente.csv y coords.csv.\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
+  },
+  {
+    "objectID": "unidad_04.html#carga-de-librerias-y-datos",
+    "href": "unidad_04.html#carga-de-librerias-y-datos",
+    "title": "Unidad 04",
+    "section": "2.1 Carga de librerias y datos",
+    "text": "2.1 Carga de librerias y datos\n\nlibrary(factoextra)"
+  },
+  {
+    "objectID": "unidad_02.html",
+    "href": "unidad_02.html",
+    "title": "Unidad 02",
+    "section": "",
+    "text": "En esta guí se verá como calcular indices de diversidad funcional y diversidad taxonómica. Se utilizaran los sets de datos llamados abun_hormigas.csv, categ_hormigas.csv, medidas_hormigas.csv, abundancia.csv y taxa.csv.\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
+  },
+  {
+    "objectID": "unidad_02.html#carga-de-librerias-y-datos",
+    "href": "unidad_02.html#carga-de-librerias-y-datos",
+    "title": "Unidad 02",
+    "section": "2.1 Carga de librerias y datos",
+    "text": "2.1 Carga de librerias y datos\n\nlibrary(tidyverse)\nlibrary(FD)\n\nset.seed(2025)\n\nabund &lt;- read.csv(\"datos/abun_hormigas.csv\", header = TRUE, row.names = 1)\nmedidas &lt;- read.csv(\"datos/medidas_hormigas.csv\", header = TRUE, row.names = 1)\ncategs &lt;- read.csv(\"datos/categ_hormigas.csv\", header = TRUE, row.names = 1, colClasses = \"factor\")"
+  },
+  {
+    "objectID": "unidad_02.html#análisis",
+    "href": "unidad_02.html#análisis",
+    "title": "Unidad 02",
+    "section": "2.2 Análisis",
+    "text": "2.2 Análisis\n\n# Diversidad con variables continuas\ndiv_medidas &lt;- dbFD(medidas, abund)\n\n# Diversidad con variables categoricas\ndiv_categs &lt;- dbFD(categs, abund)\n\n# Tablas resumen\ntb_div_medidas &lt;- rbind(\n  div_medidas$FRic,\n  div_medidas$FEve,\n  div_medidas$FDiv,\n  div_medidas$FDis\n) %&gt;% as.data.frame()\n\ntb_div_medidas &lt;- cbind(Index = c(\"FRic\", \"FEve\", \"FDiv\", \"FDis\"), tb_div_medidas)\ntb_div_medidas\n\ntb_div_categs &lt;- rbind(\n  div_categs$FRic,\n  div_categs$FEve,\n  div_categs$FDis\n) %&gt;% as.data.frame()\n\ntb_div_categs &lt;- cbind(Index = c(\"FRic\", \"FEve\", \"FDis\"), tb_div_categs)\ntb_div_categs\n\nEn el caso de las variables categóricas no es posible calcular FDiv y FRic mide la cantidad de combinaciones únicas de rasgos."
+  },
+  {
+    "objectID": "unidad_02.html#gráficos",
+    "href": "unidad_02.html#gráficos",
+    "title": "Unidad 02",
+    "section": "2.3 Gráficos",
+    "text": "2.3 Gráficos\n\n# Transformamos la tabla a formato largo para ggplot\ndiv_medidas_long  &lt;- tb_div_medidas %&gt;%\n  pivot_longer(\n    ECB:ECD,\n    names_to = \"Ambiente\",\n    values_to = \"val\"\n  )\ndiv_medidas_long$Ambiente &lt;- factor(div_meas_long$Ambiente, levels = c(\"ECB\", \"ECI\", \"ECD\"))\n\ndiv_medidas_plot &lt;- ggplot(div_medidas_long, aes(x = Ambiente, y = val, fill = Ambiente)) +\n  ylab(\"\") +\n  xlab(\"\") +\n  geom_col(show.legend = FALSE) +\n  scale_fill_manual(values = c(\"#20854E\", \"#E18727\", \"#BC3C29\")) +\n  scale_y_continuous(expand = c(0, 0)) +\n  facet_wrap(Index ~ ., scale = \"free\", axes = \"all\", ncol = 2, strip.position = \"left\") +\n  theme_classic() +\n  theme(strip.placement = \"outside\", strip.background = element_blank())\ndiv_medidas_plot"
+  },
+  {
+    "objectID": "unidad_02.html#carga-de-librerias-y-datos-1",
+    "href": "unidad_02.html#carga-de-librerias-y-datos-1",
+    "title": "Unidad 02",
+    "section": "3.1 Carga de librerias y datos",
+    "text": "3.1 Carga de librerias y datos\n\nlibrary(BiodiversityR)\nlibrary(ggplot2)\nlibrary(ggrepel)\n\nabundancia &lt;- read.csv(\"datos/abundancia.csv\", header = TRUE, row.names = 1)\ntaxa &lt;- read.csv(\"datos/taxa.csv\", header = TRUE, row.names = 1)"
+  },
+  {
+    "objectID": "unidad_02.html#análisis-1",
+    "href": "unidad_02.html#análisis-1",
+    "title": "Unidad 02",
+    "section": "3.2 Análisis",
+    "text": "3.2 Análisis\n\n# Primero es necesatio crear una matriz de distancia de los taxones\ndist_taxa &lt;- taxa2dist(taxa)\n\n# Calculo diversidad\ndiv_taxonomica &lt;- taxondive(abundancia, dist_taxa)\ndiv_taxonomica"
+  },
+  {
+    "objectID": "unidad_02.html#gráfico",
+    "href": "unidad_02.html#gráfico",
+    "title": "Unidad 02",
+    "section": "3.3 Gráfico",
+    "text": "3.3 Gráfico\n\n# Transdormamos los resultados a una data.frame\ndiv_taxonomica &lt;- as.data.frame(\n  do.call(cbind, div_taxonomica)\n)\n\nggplot(div_taxonomica, aes(x = Species, y = Dplus)) +\n  geom_point() +\n  ylab(\"Δ+\") +\n  xlab(\"Riqueza\") +\n  geom_hline(aes(yintercept = EDplus), linetype = \"dotted\") +\n  geom_ribbon(aes(ymax = EDplus + sd.Dplus * 2, ymin = EDplus - sd.Dplus * 2), fill = NA, color = \"black\") +\n  geom_text_repel(aes(label = row.names(div_taxonomica)), size = 3.5, color = \"blue3\") +\n  theme_classic()"
+  },
+  {
+    "objectID": "unidad_03.html",
+    "href": "unidad_03.html",
+    "title": "Unidad 03",
+    "section": "",
+    "text": "Aquí veremos distintas formas de medir y representar la estructura de una comunidad. Se utilizaran los datasets abundancia.csv, ambiente.csv, abundancia_conservacion.csv y abundancia_conservacion_02.csv.\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
+  },
+  {
+    "objectID": "unidad_03.html#carga-de-librerias-y-datos",
+    "href": "unidad_03.html#carga-de-librerias-y-datos",
+    "title": "Unidad 03",
+    "section": "2.1 Carga de librerias y datos",
+    "text": "2.1 Carga de librerias y datos\n\nlibrary(betapart)\n\nabundancia &lt;- read.csv(\"datos/abundancia_conservacion_02.csv\", header = TRUE, row.names = 1)"
+  },
+  {
+    "objectID": "unidad_03.html#análisis",
+    "href": "unidad_03.html#análisis",
+    "title": "Unidad 03",
+    "section": "2.2 Análisis",
+    "text": "2.2 Análisis\n\n# Para calcular la diversidad beta es necesario datos de incidencia\nincidencia &lt;- ifelse(abundancia &gt; 0, 1, 0)\n\ndiv_beta &lt;- betapart.core(incidencia)\ndiv_beta"
+  },
+  {
+    "objectID": "unidad_03.html#beta-partición",
+    "href": "unidad_03.html#beta-partición",
+    "title": "Unidad 03",
+    "section": "2.3 Beta partición",
+    "text": "2.3 Beta partición\n\n## En base Jaccard\nbeta_jac &lt;- beta.multi(incidencia, index.family = \"jac\")\nbeta_jac\n\n# Distancias\ndist_jac &lt;- beta.pair(incidencia, index.family = \"jac\")\ndist_jac\n\n## En base Sørensen\nbeta_sor &lt;- beta.multi(incidencia, index.family = \"sor\")\nbeta_sor\n\n# Distancias\ndist_sor &lt;- beta.pair(incidencia, index.family = \"sor\")\ndist_sor"
+  },
+  {
+    "objectID": "unidad_03.html#carga-de-librerias-y-datos-1",
+    "href": "unidad_03.html#carga-de-librerias-y-datos-1",
+    "title": "Unidad 03",
+    "section": "3.1 Carga de librerias y datos",
+    "text": "3.1 Carga de librerias y datos\n\nlibrary(BiodiversityR)\nlibrary(ggplot2)\nlibrary(ggrepel)\n\nabundancia &lt;- read.csv(\"datos/abundancia.csv\", header = TRUE, row.names = 1)\nambiente &lt;- read.csv(\"datos/ambiente.csv\", header = TRUE, row.names = 1)"
+  },
+  {
+    "objectID": "unidad_03.html#curva-de-whitaker",
+    "href": "unidad_03.html#curva-de-whitaker",
+    "title": "Unidad 03",
+    "section": "3.2 Curva de Whitaker",
+    "text": "3.2 Curva de Whitaker\n\n# Variable categórica como factor\nambiente$estado_conservacion &lt;- factor(ambiente$estado_conservacion)\n\nrank_abundancia &lt;- rankabuncomp(\n  abundancia,\n  y = ambiente,\n  factor = \"estado_conservacion\",\n  legend = FALSE\n)\n\n# Funcion para graficar grupos de forma independiente\ncurva_whitt &lt;- function(datos, grupo, color) {\n  x &lt;- subset(datos, Grouping == grupo)\n  plot &lt;- ggplot(x, aes(x = rank, y = abundance)) +\n    geom_line(color = color) +\n    geom_point(size = 2.5, color = color) +\n    labs(x = \"Rank\", y = \"Abundancia\") +\n    theme_classic()\n  plot\n}\n\ncurva_whitt(rank_abundancia, \"ECB\", \"darkgreen\")\ncurva_whitt(rank_abundancia, \"ECI\", \"orange\")\ncurva_whitt(rank_abundancia, \"ECD\", \"red\")\n\n# Gráfico con todos los grupos\nggplot(rank_abundancia, aes(x = rank, y = abundance, color = Grouping)) +\n  geom_line() +\n  geom_point(size = 2.5) +\n  scale_color_manual(breaks = c(\"ECB\", \"ECI\", \"ECD\"), values = c(\"darkgreen\", \"orange\", \"red\")) +\n  labs(x = \"Rank\", y = \"Abundancia\", color = NULL, shape = NULL) +\n  theme_classic() +\n  theme(legend.position = \"top\")"
+  },
+  {
+    "objectID": "unidad_03.html#curvas-de-acumulación",
+    "href": "unidad_03.html#curvas-de-acumulación",
+    "title": "Unidad 03",
+    "section": "3.3 Curvas de acumulación",
+    "text": "3.3 Curvas de acumulación\n\ncurva &lt;- specaccum(abundancia)\ncurva\n\n# Tabla resumen\ndatos_sp &lt;- data.frame(\n  Sitios = curva$sites,\n  Riqueza = curva$richness,\n  SD = curva$sd\n)\ndatos_sp\n\n# Grafico\nggplot(datos_sp, aes(x = Sitios, y = Riqueza)) +\n  geom_ribbon(aes(ymin = Riqueza - SD, ymax = Riqueza + SD), fill = \"grey90\") +\n  scale_x_continuous(breaks = datos_sp$Sitios) +\n  geom_line(color = \"blue\") +\n  theme_classic()"
+  },
+  {
+    "objectID": "unidad_03.html#carga-de-librerias-y-datos-2",
+    "href": "unidad_03.html#carga-de-librerias-y-datos-2",
+    "title": "Unidad 03",
+    "section": "4.1 Carga de librerias y datos",
+    "text": "4.1 Carga de librerias y datos\n\nlibrary(iNEXT)\n\nabundancia &lt;- read.csv(\"datos/abundancia_conservacion.csv\", header = TRUE, row.names = 1)"
+  },
+  {
+    "objectID": "unidad_03.html#análisis-1",
+    "href": "unidad_03.html#análisis-1",
+    "title": "Unidad 03",
+    "section": "4.2 Análisis",
+    "text": "4.2 Análisis\n\nrarefaccion &lt;- iNEXT(abundancia, q = c(0, 1, 2), datatype = \"abundance\")\nrarefaccion\n\nEl argumento q nos permite elegir para que valores de q queremos calcular la diversidad, puede tomas cualquier valor/es. Y datatype nos permite elegir con que tipo de datos estamos realizando los calculos, en este caso tenemos datos de abundancia, pero también es posible usar datos de incidencia."
+  },
+  {
+    "objectID": "unidad_03.html#gráficos",
+    "href": "unidad_03.html#gráficos",
+    "title": "Unidad 03",
+    "section": "4.3 Gráficos",
+    "text": "4.3 Gráficos\n\n# Gráficos por tratamiento\nplot_ec &lt;- ggiNEXT(rarefaccion, type = 1, facet.var = \"Assemblage\") +\n  theme_classic(base_size = 10) +\n  theme(legend.position = \"bottom\")\nplot_ec\n\n# Gráficos por orden q\nplot_orderq &lt;- ggiNEXT(rarefaccion, type = 1, facet.var = \"Order.q\") +\n  theme_classic(base_size = 10) +\n  theme(legend.position = \"bottom\")\nplot_orderq"
+  },
+  {
+    "objectID": "unidad_03.html#carga-de-librerias-y-datos-3",
+    "href": "unidad_03.html#carga-de-librerias-y-datos-3",
+    "title": "Unidad 03",
+    "section": "5.1 Carga de librerias y datos",
+    "text": "5.1 Carga de librerias y datos\n\nlibrary(BiodiversityR)\nlibrary(ggplot2)\nlibrary(ggrepel)\nlibrary(ggforce)\nlibrary(concaveman)\n\nabundancia &lt;- read.csv(\"datos/abundancia.csv\", header = TRUE, row.names = 1)\nambiente &lt;- read.csv(\"datos/ambiente.csv\", header = TRUE, row.names = 1)"
+  },
+  {
+    "objectID": "unidad_03.html#análisis-2",
+    "href": "unidad_03.html#análisis-2",
+    "title": "Unidad 03",
+    "section": "5.2 Análisis",
+    "text": "5.2 Análisis\n\nset.seed(2025)\n\nresultado_nmds &lt;- metaMDS(abundancia, distance = \"bray\", K = 2)\nresultado_nmds\n\n# Stress\nresultado_nmds$stress\n\n# ANOSIM\ndist_sitios &lt;- vegdist(abundancia)\nanosim_sitios &lt;- anosim(dist_sitios, ambiente$estado_conservacion, distance = \"bray\")\nsummary(anosim_sitios)"
+  },
+  {
+    "objectID": "unidad_03.html#gráficos-1",
+    "href": "unidad_03.html#gráficos-1",
+    "title": "Unidad 03",
+    "section": "5.3 Gráficos",
+    "text": "5.3 Gráficos\n\n# Creamos un data.frame con los resultados\npuntos_nmds &lt;- as.data.frame(resultado_nmds$points)\npuntos_nmds$CONSERVACION &lt;- ambiente$estado_conservacion\n\n# Agregamos siglas para nombres de los sitios y guardamos el valor de stress\npuntos_nmds$SITIO &lt;- abbreviate(rownames(abundancia))\nestres &lt;- sprintf(\"Stress = %s\", round(resultado_nmds$stress, 2))\n\n# Graficamos\nplot_nmds &lt;- ggplot(puntos_nmds, aes(x = MDS1, y = MDS2)) +\n  ggtitle(\"NMDS\") +\n  geom_point(aes(shape = CONSERVACION), size = 3) +\n  scale_shape_manual(\n    name = \"\",\n    breaks = c(\"ECB\", \"ECI\", \"ECD\"),\n    labels = c(\"Conservado\", \"Intermedio\", \"Degradado\"),\n    values = c(15, 16, 17)\n  ) +\n  geom_mark_hull(\n    aes(group = CONSERVACION, linetype = CONSERVACION),\n    concavity = 10,\n    radius = 0,\n    expand = 0,\n    show.legend = FALSE\n  ) +\n  scale_linetype_manual(values = c(\"solid\", \"dashed\", \"dotted\")) +\n  annotate(\"text\", x = +Inf, y = +Inf, label = estres, hjust = 1, vjust = 1) +\n  theme_classic()\nplot_nmds\n\n# Opcionalmente podemos añadir el nombre de los sitios\nplot_nmds +\n  geom_text_repel(\n    aes(label = SITIO),\n    box.padding = 0.5,\n    size = 3.5,\n    colour = \"blue\",\n  )"
+  }
+]
