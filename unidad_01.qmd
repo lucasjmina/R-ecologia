@@ -109,7 +109,7 @@ est_puntos$Assemblage <- factor(est_puntos$Assemblage, levels = c("ECB", "ECI", 
 ggplot(est_puntos, aes(x = Order.q, y = qD, group = Assemblage, color = Assemblage)) +
   geom_line() +
   geom_point(
-    data = filter(est_puntos, Order.q == 0 | Order.q == 1 | Order.q == 2),
+    data = filter(est_puntos, Order.q %in% c(0, 1, 2)),
     aes(x = Order.q, y = qD, group = Assemblage, color = Assemblage)
   ) +
   labs(x = "Orden q", y = "Diversidad", color = "Estado\nconservación") +
