@@ -56,11 +56,18 @@
     "text": "Aquí veremos distintas formas de medir y representar la estructura de una comunidad. Se utilizaran los datasets abundancia.csv, ambiente.csv, abundancia_conservacion.csv y abundancia_conservacion_02.csv.\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
   },
   {
-    "objectID": "unidad_03.html#beta-partición",
-    "href": "unidad_03.html#beta-partición",
+    "objectID": "unidad_03.html#dismilitud-entre-multiples-sitios",
+    "href": "unidad_03.html#dismilitud-entre-multiples-sitios",
     "title": "Unidad 03",
-    "section": "3.1 Beta partición",
-    "text": "3.1 Beta partición\n\n## En base Jaccard\nbeta_jac &lt;- beta.multi(incidencia, index.family = \"jac\")\nbeta_jac\n\n# Distancias\ndist_jac &lt;- beta.pair(incidencia, index.family = \"jac\")\ndist_jac\n\n## En base Sørensen\nbeta_sor &lt;- beta.multi(incidencia, index.family = \"sor\")\nbeta_sor\n\n# Distancias\ndist_sor &lt;- beta.pair(incidencia, index.family = \"sor\")\ndist_sor"
+    "section": "3.1 Dismilitud entre multiples sitios",
+    "text": "3.1 Dismilitud entre multiples sitios\nCalcula el recambio (turnover) y anidamiento (nestedness) de especies entre todos los sitios.\n\n## En base Jaccard\nmulti_jac &lt;- beta.multi(div_beta, index.family = \"jac\")\nmulti_jac\n\n## En base Sørensen\nmulti_sor &lt;- beta.multi(div_beta, index.family = \"sor\")\nmulti_sor\n\n## Gráficos\n\n# Jaccard\nmulti_jac_df &lt;- data.frame(\n  Componente = c(\"Total (βjac)\", \"Recambio (βjtu)\", \"Anidamiento (βjne)\"),\n  Valor = unlist(multi_jac)\n)\n\nggplot(multi_jac_df, aes(x = Componente, y = Valor, fill = Componente)) +\n  geom_col(show.legend = FALSE) +\n  geom_text(aes(label = round(Valor, 2)), vjust = -0.5) +\n  scale_fill_brewer(palette = \"Set2\") +\n  labs(y = \"Disimilitud\", x = \"Componente\") +\n  ylim(0, 1) +\n  theme_classic()\n\n# Sorenssen\nmulti_sor_df &lt;- data.frame(\n  Componente = c(\"Total (βsor)\", \"Recambio (βsim)\", \"Anidamiento (βsne)\"),\n  Valor = unlist(multi_sor)\n)\n\nggplot(multi_jac_df, aes(x = Componente, y = Valor, fill = Componente)) +\n  geom_col(show.legend = FALSE) +\n  geom_text(aes(label = round(Valor, 2)), vjust = -0.5) +\n  scale_fill_brewer(palette = \"Set2\") +\n  labs(y = \"Disimilitud\", x = \"Componente\") +\n  ylim(0, 1) +\n  theme_classic()"
+  },
+  {
+    "objectID": "unidad_03.html#disimilitud-entre-pares",
+    "href": "unidad_03.html#disimilitud-entre-pares",
+    "title": "Unidad 03",
+    "section": "3.2 Disimilitud entre pares",
+    "text": "3.2 Disimilitud entre pares\nCalcula la disimitud entre pares de sitios, generando una matriz de distancias. Para visualizar estas distancias realizaremos un gráfico de cluster.\n\n# Base Jaccard\npair_jac &lt;- beta.pair(div_beta, index.family = \"jac\")\npair_jac\n\n# Base Sorensen\npair_sor &lt;- beta.pair(div_beta, index.family = \"sor\")\npair_sor\n\n## Gráficos\n\n# Se crean los objetos hclust\nhclust_jac &lt;- hcut(pair_jac$beta.jac, hc_method = \"average\", hc_func = \"hclust\")\nhclust_sor &lt;- hcut(pair_sor$beta.sor, hc_method = \"average\", hc_func = \"hclust\")\n\n# Cluster Jaccard\nfviz_dend(hclust_jac, palette = \"Set2\", horiz = TRUE, main = \"Dendograma Jaccard\")\n\n# Cluster Sorensen\nfviz_dend(hclust_sor, palette = \"Set2\", horiz = TRUE, main = \"Dendograma Sorensen\")\n\nEstos gráficos están basados en ggplot, así que es posible personalizarlos como cualquier otro gráfico de ggplot."
   },
   {
     "objectID": "unidad_03.html#gráficos",
