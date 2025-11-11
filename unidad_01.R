@@ -4,7 +4,7 @@ library(vegan)
 library(ggplot2)
 library(tidyverse)
 library(iNEXT)
-
+library(fossil)
 # ---- Datos ----
 #
 datos <- read.csv("datos/abundancia_tratamiento.csv", header = TRUE)
@@ -37,8 +37,10 @@ ggplot(tabla_riqueza, aes(x = estadoConservacion, y = S, fill = estadoConservaci
 
 # ---- Estimadores ----
 
-estimadores <- specpool(abundancia, datos$estadoConservacion)
+estimadores <- specpool(abundancia, datos$localidad)
 estimadores
+
+estimateR(abundancia)
 
 # ---- ACE/ICE -----
 
@@ -48,12 +50,13 @@ ace_ice <- pivot_longer(
   values_to = "abund"
 ) %>%
   reframe(
-    .by = estadoConservacion,
-    ACE = fossil::ACE(abund),
-    ICE = fossil::ICE(abund)
+    .by = localidad,
+    ACE = ACE(abund),
+    ICE = ICE(abund)
   ) %>%
   unique()
 ace_ice
+
 
 # ---- Shannon y Simpson
 
@@ -69,6 +72,18 @@ res_div <- D %>%
   left_join(H, by = "Tratamiento")
 res_div
 
+# Por localidad
+D <- diversity(abundancia, index = "simpson") %>%
+  enframe(name = "localidad", value = "D")
+iD <- diversity(abundancia, index = "invsimpson") %>%
+  enframe(name = "localidad", value = "iD")
+H <- diversity(abundancia, index = "shannon") %>%
+  enframe(name = "localidad", value = "H")
+
+res_div_loc <- D %>%
+  left_join(iD, by = "localidad") %>%
+  left_join(H, by = "localidad")
+res_div_loc
 
 # ---- Diversidad verdadera ----
 

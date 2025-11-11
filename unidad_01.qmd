@@ -8,7 +8,7 @@ format:
 
 # Introducción
 
-En esta guía veremos como calcular distintos índices de diversidad alfa cómo Shannon, Simpson y diversidad verdadera. Así como estimadores: Chao, Jacknife, ACE e ICE. Se utilizaran los set de datos llamados `abundancia_tratamiento.csv` y `abundancia_conservacion.csv`
+En esta guía veremos como calcular distintos índices de diversidad alfa cómo Shannon, Simpson y diversidad verdadera. Así como estimadores: Chao, Jacknife, ACE e ICE. Se utilizaran los set de datos llamados `abundancia_tratamiento.csv` y `abundancia_conservacion_larga.csv`
 
 **NOTA**: Es recomendable que trabajen dentro de un proyecto de RStudio.
 
@@ -21,7 +21,7 @@ library(tidyverse)
 library(iNEXT)
 
 datos <- read.csv("datos/abundancia_tratamiento.csv", header = TRUE)
-abund_ec <- read.csv("datos/abundancia_conservacion.csv", header = TRUE, row.names = 1)
+abund_ec <- read.csv("datos/abundancia_conservacion_larga.csv", header = TRUE, row.names = 1)
 
 # Tabla de abundancias (solo valores numéricos)
 abundancia <- select(datos, !localidad:estadoConservacion)

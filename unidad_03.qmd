@@ -12,21 +12,36 @@ Aquí veremos distintas formas de medir y representar la estructura de una comun
 
 **NOTA**: Es recomendable que trabajen dentro de un proyecto de RStudio.
 
-# Diversidad Beta
-
-## Carga de librerias y datos
+# Carga de librerias y datos
 
 ```{r}
+library(BiodiversityR)
 library(betapart)
+library(ggplot2)
+library(ggrepel)
+library(ggforce)
+library(concaveman)
+library(iNEXT)
 
-abundancia <- read.csv("datos/abundancia_conservacion_02.csv", header = TRUE, row.names = 1)
+set.seed(2025)
+
+# Para diversidad beta
+abund_conservacion <- read.csv("datos/abundancia_conservacion.csv", header = TRUE, row.names = 1)
+
+
+# Para curvas de Whittaker y acumulación, y análisis NMDS 
+abundancia <- read.csv("datos/abundancia.csv", header = TRUE, row.names = 1)
+ambiente <- read.csv("datos/ambiente.csv", header = TRUE, row.names = 1)
+
+# Para curvas de rarefacción
+abund_larga <- read.csv("datos/abundancia_conservacion_larga.csv", header = TRUE, row.names = 1)
 ```
 
-## Análisis
+# Diversidad Beta
 
 ```{r}
 # Para calcular la diversidad beta es necesario datos de incidencia
-incidencia <- ifelse(abundancia > 0, 1, 0)
+incidencia <- decostand(abund_conservacion, method = "pa")
 
 div_beta <- betapart.core(incidencia)
 div_beta
@@ -53,24 +68,11 @@ dist_sor <- beta.pair(incidencia, index.family = "sor")
 dist_sor
 ```
 
-# Curvas de Whitaker y acumulación
-
-## Carga de librerias y datos
-
-```{r}
-library(BiodiversityR)
-library(ggplot2)
-library(ggrepel)
-
-abundancia <- read.csv("datos/abundancia.csv", header = TRUE, row.names = 1)
-ambiente <- read.csv("datos/ambiente.csv", header = TRUE, row.names = 1)
-```
-
-## Curva de Whitaker
+# Curva de Whitaker
 
 ```{r}
 # Variable categórica como factor
-ambiente$estado_conservacion <- factor(ambiente$estado_conservacion)
+ambiente$estado_conservacion <- factor(ambiente$estado_conservacion, levels = c("ECB", "ECI", "ECD"))
 
 rank_abundancia <- rankabuncomp(
   abundancia,
@@ -104,19 +106,18 @@ ggplot(rank_abundancia, aes(x = rank, y = abundance, color = Grouping)) +
   theme(legend.position = "top")
 ```
 
-## Curvas de acumulación
+# Curvas de acumulación
 
 ```{r}
 curva <- specaccum(abundancia)
 curva
 
-# Tabla resumen
+# Tabla para ggplot
 datos_sp <- data.frame(
   Sitios = curva$sites,
   Riqueza = curva$richness,
   SD = curva$sd
 )
-datos_sp
 
 # Grafico
 ggplot(datos_sp, aes(x = Sitios, y = Riqueza)) +
@@ -128,18 +129,8 @@ ggplot(datos_sp, aes(x = Sitios, y = Riqueza)) +
 
 # Curvas de rarefacción
 
-## Carga de librerias y datos
-
 ```{r}
-library(iNEXT)
-
-abundancia <- read.csv("datos/abundancia_conservacion.csv", header = TRUE, row.names = 1)
-```
-
-## Análisis
-
-```{r}
-rarefaccion <- iNEXT(abundancia, q = c(0, 1, 2), datatype = "abundance")
+rarefaccion <- iNEXT(abund_larga, q = c(0, 1, 2), datatype = "abundance")
 rarefaccion
 ```
 
@@ -163,24 +154,7 @@ plot_orderq
 
 # NMDS (Escalado multi-dimensional no métrico)
 
-## Carga de librerias y datos
-
 ```{r}
-library(BiodiversityR)
-library(ggplot2)
-library(ggrepel)
-library(ggforce)
-library(concaveman)
-
-abundancia <- read.csv("datos/abundancia.csv", header = TRUE, row.names = 1)
-ambiente <- read.csv("datos/ambiente.csv", header = TRUE, row.names = 1)
-```
-
-## Análisis
-
-```{r}
-set.seed(2025)
-
 resultado_nmds <- metaMDS(abundancia, distance = "bray", K = 2)
 resultado_nmds
 
@@ -202,7 +176,7 @@ puntos_nmds$CONSERVACION <- ambiente$estado_conservacion
 
 # Agregamos siglas para nombres de los sitios y guardamos el valor de stress
 puntos_nmds$SITIO <- abbreviate(rownames(abundancia))
-estres <- sprintf("Stress = %s", round(resultado_nmds$stress, 2))
+estres <- paste("Stress =", round(resultado_nmds$stress, 2))
 
 # Graficamos
 plot_nmds <- ggplot(puntos_nmds, aes(x = MDS1, y = MDS2)) +

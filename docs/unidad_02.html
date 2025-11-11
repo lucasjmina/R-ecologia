@@ -157,17 +157,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul class="collapse">
   <li><a href="#introducción" id="toc-introducción" class="nav-link active" data-scroll-target="#introducción"><span class="header-section-number">1</span> Introducción</a></li>
-  <li><a href="#diversidad-funcional" id="toc-diversidad-funcional" class="nav-link" data-scroll-target="#diversidad-funcional"><span class="header-section-number">2</span> Diversidad funcional</a>
+  <li><a href="#carga-de-librerias-y-datos" id="toc-carga-de-librerias-y-datos" class="nav-link" data-scroll-target="#carga-de-librerias-y-datos"><span class="header-section-number">2</span> Carga de librerias y datos</a></li>
+  <li><a href="#preparación-directorios" id="toc-preparación-directorios" class="nav-link" data-scroll-target="#preparación-directorios"><span class="header-section-number">3</span> Preparación directorios</a></li>
+  <li><a href="#diversidad-funcional" id="toc-diversidad-funcional" class="nav-link" data-scroll-target="#diversidad-funcional"><span class="header-section-number">4</span> Diversidad funcional</a>
   <ul class="collapse">
-  <li><a href="#carga-de-librerias-y-datos" id="toc-carga-de-librerias-y-datos" class="nav-link" data-scroll-target="#carga-de-librerias-y-datos"><span class="header-section-number">2.1</span> Carga de librerias y datos</a></li>
-  <li><a href="#análisis" id="toc-análisis" class="nav-link" data-scroll-target="#análisis"><span class="header-section-number">2.2</span> Análisis</a></li>
-  <li><a href="#gráficos" id="toc-gráficos" class="nav-link" data-scroll-target="#gráficos"><span class="header-section-number">2.3</span> Gráficos</a></li>
+  <li><a href="#gráficos" id="toc-gráficos" class="nav-link" data-scroll-target="#gráficos"><span class="header-section-number">4.1</span> Gráficos</a></li>
   </ul></li>
-  <li><a href="#diversidad-taxonómica" id="toc-diversidad-taxonómica" class="nav-link" data-scroll-target="#diversidad-taxonómica"><span class="header-section-number">3</span> Diversidad taxonómica</a>
+  <li><a href="#diversidad-taxonómica" id="toc-diversidad-taxonómica" class="nav-link" data-scroll-target="#diversidad-taxonómica"><span class="header-section-number">5</span> Diversidad taxonómica</a>
   <ul class="collapse">
-  <li><a href="#carga-de-librerias-y-datos-1" id="toc-carga-de-librerias-y-datos-1" class="nav-link" data-scroll-target="#carga-de-librerias-y-datos-1"><span class="header-section-number">3.1</span> Carga de librerias y datos</a></li>
-  <li><a href="#análisis-1" id="toc-análisis-1" class="nav-link" data-scroll-target="#análisis-1"><span class="header-section-number">3.2</span> Análisis</a></li>
-  <li><a href="#gráfico" id="toc-gráfico" class="nav-link" data-scroll-target="#gráfico"><span class="header-section-number">3.3</span> Gráfico</a></li>
+  <li><a href="#gráfico" id="toc-gráfico" class="nav-link" data-scroll-target="#gráfico"><span class="header-section-number">5.1</span> Gráfico</a></li>
   </ul></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="unidad_02.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
@@ -206,92 +204,124 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>En esta guí se verá como calcular indices de diversidad funcional y diversidad taxonómica. Se utilizaran los sets de datos llamados <code>abun_hormigas.csv</code>, <code>categ_hormigas.csv</code>, <code>medidas_hormigas.csv</code>, <code>abundancia.csv</code> y <code>taxa.csv</code>.</p>
 <p><strong>NOTA</strong>: Es recomendable que trabajen dentro de un proyecto de RStudio.</p>
 </section>
-<section id="diversidad-funcional" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Diversidad funcional</h1>
-<section id="carga-de-librerias-y-datos" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="carga-de-librerias-y-datos"><span class="header-section-number">2.1</span> Carga de librerias y datos</h2>
+<section id="carga-de-librerias-y-datos" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Carga de librerias y datos</h1>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(FD)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>abund <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"datos/abun_hormigas.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">row.names =</span> <span class="dv">1</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>medidas <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"datos/medidas_hormigas.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">row.names =</span> <span class="dv">1</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>categs <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"datos/categ_hormigas.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">row.names =</span> <span class="dv">1</span>, <span class="at">colClasses =</span> <span class="st">"factor"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(BiodiversityR)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(FD)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Para análisis diversidad funcional</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>abund_hormigas <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"datos/abund_hormigas.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">row.names =</span> <span class="dv">1</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>medidas <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"datos/medidas_hormigas.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">row.names =</span> <span class="dv">1</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>categs <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"datos/categ_hormigas.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">row.names =</span> <span class="dv">1</span>, <span class="at">colClasses =</span> <span class="st">"factor"</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Para análisis diversidad taxonomica</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>abundancia <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"datos/abundancia.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">row.names =</span> <span class="dv">1</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>taxa <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"datos/taxa.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">row.names =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="análisis" class="level2" data-number="2.2">
-<h2 data-number="2.2" class="anchored" data-anchor-id="análisis"><span class="header-section-number">2.2</span> Análisis</h2>
+<section id="preparación-directorios" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Preparación directorios</h1>
+<p>Aquí crearemos algunas carperas para guardar los resultados de los análisis. Notese que si el directorio existe la función arroja un aviso y <strong>no</strong> sobrescribe el directorio</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Diversidad con variables continuas</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>div_medidas <span class="ot">&lt;-</span> <span class="fu">dbFD</span>(medidas, abund)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Para guardar tablas</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="st">"salida"</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Diversidad con variables categoricas</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>div_categs <span class="ot">&lt;-</span> <span class="fu">dbFD</span>(categs, abund)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Tablas resumen</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>tb_div_medidas <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  div_medidas<span class="sc">$</span>FRic,</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  div_medidas<span class="sc">$</span>FEve,</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  div_medidas<span class="sc">$</span>FDiv,</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  div_medidas<span class="sc">$</span>FDis</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> <span class="fu">as.data.frame</span>()</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>tb_div_medidas <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="at">Index =</span> <span class="fu">c</span>(<span class="st">"FRic"</span>, <span class="st">"FEve"</span>, <span class="st">"FDiv"</span>, <span class="st">"FDis"</span>), tb_div_medidas)</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>tb_div_medidas</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>tb_div_categs <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  div_categs<span class="sc">$</span>FRic,</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  div_categs<span class="sc">$</span>FEve,</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  div_categs<span class="sc">$</span>FDis</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> <span class="fu">as.data.frame</span>()</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>tb_div_categs <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="at">Index =</span> <span class="fu">c</span>(<span class="st">"FRic"</span>, <span class="st">"FEve"</span>, <span class="st">"FDis"</span>), tb_div_categs)</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>tb_div_categs</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Para guardar gráficos</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="st">"graficos"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="diversidad-funcional" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Diversidad funcional</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Diversidad con variables continuas</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>div_medidas <span class="ot">&lt;-</span> <span class="fu">dbFD</span>(medidas, abund_hormigas)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Diversidad con variables categoricas</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>div_categs <span class="ot">&lt;-</span> <span class="fu">dbFD</span>(categs, abund_hormigas)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Tablas resumen</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>tb_div_medidas <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  div_medidas<span class="sc">$</span>FRic,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  div_medidas<span class="sc">$</span>FEve,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  div_medidas<span class="sc">$</span>FDiv,</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  div_medidas<span class="sc">$</span>FDis</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> <span class="fu">as.data.frame</span>()</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>tb_div_medidas <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="at">Index =</span> <span class="fu">c</span>(<span class="st">"FRic"</span>, <span class="st">"FEve"</span>, <span class="st">"FDiv"</span>, <span class="st">"FDis"</span>), tb_div_medidas)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>tb_div_medidas</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>tb_div_categs <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  div_categs<span class="sc">$</span>FRic,</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  div_categs<span class="sc">$</span>FEve,</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  div_categs<span class="sc">$</span>FDis</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> <span class="fu">as.data.frame</span>()</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>tb_div_categs <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="at">Index =</span> <span class="fu">c</span>(<span class="st">"FRic"</span>, <span class="st">"FEve"</span>, <span class="st">"FDis"</span>), tb_div_categs)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>tb_div_categs</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Guardamos las tablas</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(tb_div_medidas, <span class="st">"salida/diversidad_medidas.csv"</span>)</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(tb_div_categs, <span class="st">"salida/diversidad_categorias.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>En el caso de las variables categóricas no es posible calcular <code>FDiv</code> y <code>FRic</code> mide la cantidad de combinaciones únicas de rasgos.</p>
-</section>
-<section id="gráficos" class="level2" data-number="2.3">
-<h2 data-number="2.3" class="anchored" data-anchor-id="gráficos"><span class="header-section-number">2.3</span> Gráficos</h2>
+<section id="gráficos" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="gráficos"><span class="header-section-number">4.1</span> Gráficos</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Transformamos la tabla a formato largo para ggplot</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>div_medidas_long  <span class="ot">&lt;-</span> tb_div_medidas <span class="sc">%&gt;%</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    ECB<span class="sc">:</span>ECD,</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"Ambiente"</span>,</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"val"</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>div_medidas_long<span class="sc">$</span>Ambiente <span class="ot">&lt;-</span> <span class="fu">factor</span>(div_meas_long<span class="sc">$</span>Ambiente, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"ECB"</span>, <span class="st">"ECI"</span>, <span class="st">"ECD"</span>))</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>div_medidas_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(div_medidas_long, <span class="fu">aes</span>(<span class="at">x =</span> Ambiente, <span class="at">y =</span> val, <span class="at">fill =</span> Ambiente)) <span class="sc">+</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">""</span>) <span class="sc">+</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">""</span>) <span class="sc">+</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#20854E"</span>, <span class="st">"#E18727"</span>, <span class="st">"#BC3C29"</span>)) <span class="sc">+</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(Index <span class="sc">~</span> ., <span class="at">scale =</span> <span class="st">"free"</span>, <span class="at">axes =</span> <span class="st">"all"</span>, <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">strip.position =</span> <span class="st">"left"</span>) <span class="sc">+</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">strip.placement =</span> <span class="st">"outside"</span>, <span class="at">strip.background =</span> <span class="fu">element_blank</span>())</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>div_medidas_plot</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Transformamos las tablas a formato largo para ggplot</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>div_medidas_long  <span class="ot">&lt;-</span> tb_div_medidas <span class="sc">%&gt;%</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    ECB<span class="sc">:</span>ECD,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"Ambiente"</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"val"</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Ambiente =</span> <span class="fu">factor</span>(Ambiente, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"ECB"</span>, <span class="st">"ECI"</span>, <span class="st">"ECD"</span>)))</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>div_categs_long  <span class="ot">&lt;-</span> tb_div_categs <span class="sc">%&gt;%</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    ECB<span class="sc">:</span>ECD,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"Ambiente"</span>,</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"val"</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Ambiente =</span> <span class="fu">factor</span>(Ambiente, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"ECB"</span>, <span class="st">"ECI"</span>, <span class="st">"ECD"</span>)))</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Gráfico diversidad rasgos continuos</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>div_medidas_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(div_medidas_long, <span class="fu">aes</span>(<span class="at">x =</span> Ambiente, <span class="at">y =</span> val, <span class="at">fill =</span> Ambiente)) <span class="sc">+</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#20854E"</span>, <span class="st">"#E18727"</span>, <span class="st">"#BC3C29"</span>)) <span class="sc">+</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(Index <span class="sc">~</span> ., <span class="at">scale =</span> <span class="st">"free"</span>, <span class="at">axes =</span> <span class="st">"all"</span>, <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">strip.position =</span> <span class="st">"left"</span>) <span class="sc">+</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">strip.placement =</span> <span class="st">"outside"</span>, <span class="at">strip.background =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>div_medidas_plot</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="co">#Gráfico diversidad rasgos categoricos</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>div_categs_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(div_categs_long, <span class="fu">aes</span>(<span class="at">x =</span> Ambiente, <span class="at">y =</span> val, <span class="at">fill =</span> Ambiente)) <span class="sc">+</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#20854E"</span>, <span class="st">"#E18727"</span>, <span class="st">"#BC3C29"</span>)) <span class="sc">+</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(Index <span class="sc">~</span> ., <span class="at">scale =</span> <span class="st">"free"</span>, <span class="at">axes =</span> <span class="st">"all"</span>, <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">strip.position =</span> <span class="st">"left"</span>) <span class="sc">+</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">strip.placement =</span> <span class="st">"outside"</span>, <span class="at">strip.background =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>div_categs_plot</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Guardamos los gráficos</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"graficos/diversidad_medidas.png"</span>, div_medidas_plot, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">2000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"graficos/diversidad_categorias.png"</span>, div_categs_plot, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">2000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 </section>
-<section id="diversidad-taxonómica" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Diversidad taxonómica</h1>
-<section id="carga-de-librerias-y-datos-1" class="level2" data-number="3.1">
-<h2 data-number="3.1" class="anchored" data-anchor-id="carga-de-librerias-y-datos-1"><span class="header-section-number">3.1</span> Carga de librerias y datos</h2>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(BiodiversityR)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>abundancia <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"datos/abundancia.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">row.names =</span> <span class="dv">1</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>taxa <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"datos/taxa.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">row.names =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-<section id="análisis-1" class="level2" data-number="3.2">
-<h2 data-number="3.2" class="anchored" data-anchor-id="análisis-1"><span class="header-section-number">3.2</span> Análisis</h2>
+<section id="diversidad-taxonómica" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Diversidad taxonómica</h1>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Primero es necesatio crear una matriz de distancia de los taxones</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>dist_taxa <span class="ot">&lt;-</span> <span class="fu">taxa2dist</span>(taxa)</span>
@@ -300,23 +330,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>div_taxonomica <span class="ot">&lt;-</span> <span class="fu">taxondive</span>(abundancia, dist_taxa)</span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>div_taxonomica</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</section>
-<section id="gráfico" class="level2" data-number="3.3">
-<h2 data-number="3.3" class="anchored" data-anchor-id="gráfico"><span class="header-section-number">3.3</span> Gráfico</h2>
+<section id="gráfico" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="gráfico"><span class="header-section-number">5.1</span> Gráfico</h2>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Transdormamos los resultados a una data.frame</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>div_taxonomica <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">do.call</span>(cbind, div_taxonomica)</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(div_taxonomica, <span class="fu">aes</span>(<span class="at">x =</span> Species, <span class="at">y =</span> Dplus)) <span class="sc">+</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>div_taxa_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(div_taxonomica, <span class="fu">aes</span>(<span class="at">x =</span> Species, <span class="at">y =</span> Dplus)) <span class="sc">+</span></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Δ+"</span>) <span class="sc">+</span></span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Riqueza"</span>) <span class="sc">+</span></span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="fu">aes</span>(<span class="at">yintercept =</span> EDplus), <span class="at">linetype =</span> <span class="st">"dotted"</span>) <span class="sc">+</span></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymax =</span> EDplus <span class="sc">+</span> sd.Dplus <span class="sc">*</span> <span class="dv">2</span>, <span class="at">ymin =</span> EDplus <span class="sc">-</span> sd.Dplus <span class="sc">*</span> <span class="dv">2</span>), <span class="at">fill =</span> <span class="cn">NA</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text_repel</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">row.names</span>(div_taxonomica)), <span class="at">size =</span> <span class="fl">3.5</span>, <span class="at">color =</span> <span class="st">"blue3"</span>) <span class="sc">+</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>div_taxa_plot</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"graficos/div_taxonomica.png"</span>, div_taxa_plot, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">2000</span>, <span class="at">height =</span> <span class="dv">2000</span>, <span class="at">units =</span> <span class="st">"px"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
