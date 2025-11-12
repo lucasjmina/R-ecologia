@@ -53,7 +53,7 @@
     "href": "unidad_03.html",
     "title": "Unidad 03",
     "section": "",
-    "text": "Aquí veremos distintas formas de medir y representar la estructura de una comunidad. Se utilizaran los datasets abundancia.csv, ambiente.csv, abundancia_conservacion.csv y abundancia_conservacion_02.csv.\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
+    "text": "Aquí veremos distintas formas de medir y representar la estructura de una comunidad. Se utilizaran los datasets abundancia.csv, ambiente.csv, abundancia_conservacion.csv y abundancia_conservacion_larga.csv.\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
   },
   {
     "objectID": "unidad_03.html#dismilitud-entre-multiples-sitios",

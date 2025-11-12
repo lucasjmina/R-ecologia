@@ -207,7 +207,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="introducción" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Introducción</h1>
-<p>Aquí veremos distintas formas de medir y representar la estructura de una comunidad. Se utilizaran los datasets <code>abundancia.csv</code>, <code>ambiente.csv</code>, <code>abundancia_conservacion.csv</code> y <code>abundancia_conservacion_02.csv</code>.</p>
+<p>Aquí veremos distintas formas de medir y representar la estructura de una comunidad. Se utilizaran los datasets <code>abundancia.csv</code>, <code>ambiente.csv</code>, <code>abundancia_conservacion.csv</code> y <code>abundancia_conservacion_larga.csv</code>.</p>
 <p><strong>NOTA</strong>: Es recomendable que trabajen dentro de un proyecto de RStudio.</p>
 </section>
 <section id="carga-de-librerias-y-datos" class="level1" data-number="2">
@@ -406,12 +406,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>resultado_nmds</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Stress</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>resultado_nmds<span class="sc">$</span>stress</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># ANOSIM</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>dist_sitios <span class="ot">&lt;-</span> <span class="fu">vegdist</span>(abundancia)</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>anosim_sitios <span class="ot">&lt;-</span> <span class="fu">anosim</span>(dist_sitios, ambiente<span class="sc">$</span>estado_conservacion, <span class="at">distance =</span> <span class="st">"bray"</span>)</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(anosim_sitios)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>resultado_nmds<span class="sc">$</span>stress</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="gráficos-1" class="level2" data-number="7.1">
 <h2 data-number="7.1" class="anchored" data-anchor-id="gráficos-1"><span class="header-section-number">7.1</span> Gráficos</h2>
