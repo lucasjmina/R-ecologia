@@ -4,7 +4,7 @@
     "href": "unidad_04.html",
     "title": "Unidad 04",
     "section": "",
-    "text": "En esta guia veremos como realizar distintos análisis estadisticos utilizados para comprender como se relacionen variables ambientales con la estructura de la comunidad. Se utilizarand los sets de datos llamados moscas.csv, abundancia.csv, ambiente.csv y coords.csv.\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
+    "text": "1 Introducción\nEn esta guia veremos como realizar distintos análisis estadisticos utilizados para comprender como se relacionen variables ambientales con la estructura de la comunidad. Se utilizarand los sets de datos llamados moscas.csv, abundancia.csv, ambiente.csv y coordenadas.csv.\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio.\n\n\n2 Carga de librerias y datos\n\nlibrary(BiodiversityR)\nlibrary(factoextra)\nlibrary(tidyverse)\nlibrary(ggplot2)\n\n# Para PCA\nmoscas &lt;- read.csv(\"datos/moscas.csv\", header = TRUE, row.names = 1)\n\n# Para CCA\nabundancia &lt;- read.csv(\"datos/abundancia.csv\", header = TRUE, row.names = 1)\nambiente &lt;- read.csv(\"datos/ambiente.csv\", header = TRUE, row.names = 1)\n\n# Para mantel\ncoords &lt;- read.csv(\"datos/coordenadas.csv\", header = TRUE, row.names = 1)\n\n\n\n3 Análisis de componentes principales (PCA)\n\ndatos_estandarizados &lt;- scale(moscas[-1])\n\npca &lt;- prcomp(datos_estandarizados, scale = TRUE)\nsummary(pca)\n\n# Gráfico\nplot_pca &lt;- fviz_pca_biplot(pca, label = \"var\", addEllipses = TRUE, ellipse.level = 0.95, habillage = moscas$Ambiente, palette = \"Set2\") +\n  theme_classic()\nplot_pca"
   },
   {
     "objectID": "unidad_04.html#carga-de-librerias-y-datos",

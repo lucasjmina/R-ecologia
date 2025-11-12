@@ -305,6 +305,11 @@ resultado_nmds
 
 # Stress
 resultado_nmds$stress
+
+# ANOSIM
+dist_sitios <- vegdist(abundancia)
+anosim_sitios <- anosim(dist_sitios, ambiente$estado_conservacion, distance = "bray")
+summary(anosim_sitios)
 ```
 
 ## Gráficos

@@ -157,12 +157,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul class="collapse">
   <li><a href="#introducción" id="toc-introducción" class="nav-link active" data-scroll-target="#introducción"><span class="header-section-number">1</span> Introducción</a></li>
-  <li><a href="#análisis-de-componentes-principales-pca" id="toc-análisis-de-componentes-principales-pca" class="nav-link" data-scroll-target="#análisis-de-componentes-principales-pca"><span class="header-section-number">2</span> Análisis de componentes principales (PCA)</a>
-  <ul class="collapse">
-  <li><a href="#carga-de-librerias-y-datos" id="toc-carga-de-librerias-y-datos" class="nav-link" data-scroll-target="#carga-de-librerias-y-datos"><span class="header-section-number">2.1</span> Carga de librerias y datos</a></li>
-  </ul></li>
+  <li><a href="#carga-de-librerias-y-datos" id="toc-carga-de-librerias-y-datos" class="nav-link" data-scroll-target="#carga-de-librerias-y-datos"><span class="header-section-number">2</span> Carga de librerias y datos</a></li>
+  <li><a href="#análisis-de-componentes-principales-pca" id="toc-análisis-de-componentes-principales-pca" class="nav-link" data-scroll-target="#análisis-de-componentes-principales-pca"><span class="header-section-number">3</span> Análisis de componentes principales (PCA)</a></li>
   </ul>
-</nav>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="unidad_04.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -195,19 +193,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="introducción" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Introducción</h1>
-<p>En esta guia veremos como realizar distintos análisis estadisticos utilizados para comprender como se relacionen variables ambientales con la estructura de la comunidad. Se utilizarand los sets de datos llamados <code>moscas.csv</code>, <code>abundancia.csv</code>, <code>ambiente.csv</code> y <code>coords.csv</code>.</p>
+<p>En esta guia veremos como realizar distintos análisis estadisticos utilizados para comprender como se relacionen variables ambientales con la estructura de la comunidad. Se utilizarand los sets de datos llamados <code>moscas.csv</code>, <code>abundancia.csv</code>, <code>ambiente.csv</code> y <code>coordenadas.csv</code>.</p>
 <p><strong>NOTA</strong>: Es recomendable que trabajen dentro de un proyecto de RStudio.</p>
 </section>
-<section id="análisis-de-componentes-principales-pca" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Análisis de componentes principales (PCA)</h1>
-<section id="carga-de-librerias-y-datos" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="carga-de-librerias-y-datos"><span class="header-section-number">2.1</span> Carga de librerias y datos</h2>
+<section id="carga-de-librerias-y-datos" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Carga de librerias y datos</h1>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(factoextra)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(BiodiversityR)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(factoextra)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Para PCA</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>moscas <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"datos/moscas.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">row.names =</span> <span class="dv">1</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Para CCA</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>abundancia <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"datos/abundancia.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">row.names =</span> <span class="dv">1</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>ambiente <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"datos/ambiente.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">row.names =</span> <span class="dv">1</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Para mantel</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>coords <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"datos/coordenadas.csv"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">row.names =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="análisis-de-componentes-principales-pca" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Análisis de componentes principales (PCA)</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>datos_estandarizados <span class="ot">&lt;-</span> <span class="fu">scale</span>(moscas[<span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>pca <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(datos_estandarizados, <span class="at">scale =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(pca)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Gráfico</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>plot_pca <span class="ot">&lt;-</span> <span class="fu">fviz_pca_biplot</span>(pca, <span class="at">label =</span> <span class="st">"var"</span>, <span class="at">addEllipses =</span> <span class="cn">TRUE</span>, <span class="at">ellipse.level =</span> <span class="fl">0.95</span>, <span class="at">habillage =</span> moscas<span class="sc">$</span>Ambiente, <span class="at">palette =</span> <span class="st">"Set2"</span>) <span class="sc">+</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>plot_pca</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
