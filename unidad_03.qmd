@@ -8,7 +8,7 @@ format:
 
 # Introducción
 
-Aquí veremos distintas formas de medir y representar la estructura de una comunidad. Se utilizaran los datasets `abundancia.csv`, `ambiente.csv`, `abundancia_conservacion.csv` y `abundancia_conservacion_02.csv`.
+Aquí veremos distintas formas de medir y representar la estructura de una comunidad. Se utilizaran los datasets `abundancia.csv`, `ambiente.csv`, `abundancia_conservacion.csv` y `abundancia_conservacion_larga.csv`.
 
 **NOTA**: Es recomendable que trabajen dentro de un proyecto de RStudio.
 
