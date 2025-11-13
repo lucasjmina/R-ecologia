@@ -88,7 +88,7 @@ plot_pca
 
 ```{r}
 cca0 <- cca(abundancia ~ ., ambiente)
-summary(resultado_cca)
+summary(cca0)
 
 # CCA por pasos
 cca_steps <- ordistep(cca0)
@@ -101,7 +101,6 @@ summary(resultado_cca)
 
 anova_cca <- anova.cca(resultado_cca, by = "terms")
 anova_cca
-
 ```
 
 ## Gráfico
@@ -136,6 +135,8 @@ Ahora si podemos gráficar usando `ggplot`.
 # Gráfico
 
 ggplot(especies, aes(x = CCA1, y = CCA2)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey") +
   geom_point(alpha = 0.5) +
   geom_path(data = elipses, aes(color = Grupo)) +
   geom_segment(
@@ -158,7 +159,7 @@ ggplot(especies, aes(x = CCA1, y = CCA2)) +
 ```{r}
 dist_abundancia <- vegdist(abundancia, method = "bray")
 
-dist_geografica <- as.dist(distm(coords, fun = distHaversine))
+dist_geografica <- as.dist(distm(coords, fun = distGeo))
 
 resultado_mantel <- mantel(dist_abundancia, dist_geografica, method = "pearson", permutations = 9999)
 resultado_mantel
