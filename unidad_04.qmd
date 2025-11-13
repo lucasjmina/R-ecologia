@@ -47,6 +47,7 @@ matriz_cors
 
 # Gráfico correlaciones (GGally)
 ggcorr(moscas)
+ggpairs(moscas[-1])
 
 test_correlación <- cor.test(moscas$IHH, moscas$Abund_log)
 test_correlación
@@ -91,6 +92,9 @@ summary(resultado_cca)
 
 # CCA por pasos
 cca_steps <- ordistep(cca0)
+
+# Correlaciones
+ggcorr(ambiente)
 
 resultado_cca <- cca(formula = abundancia ~ hr_med + hr_min + pp_30_dias_antes, data = ambiente)
 summary(resultado_cca)
