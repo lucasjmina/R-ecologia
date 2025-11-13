@@ -1,20 +1,189 @@
 ---
 title: "Unidad 04"
 subtitle: "Evaluación de variables ambientales"
-format: html
+format:
+  html: default
+  pdf: default
 ---
 
 # Introducción
 
-En esta guia veremos como realizar distintos análisis estadisticos utilizados para comprender como se relacionen variables ambientales con la estructura de la comunidad. Se utilizarand los sets de datos llamados `moscas.csv`, `abundancia.csv`, `ambiente.csv` y `coords.csv`.
+En esta guia veremos como realizar distintos análisis estadisticos utilizados para comprender como se relacionen variables ambientales con la estructura de la comunidad. Se utilizarand los sets de datos llamados `moscas.csv`, `abundancia.csv`, `ambiente.csv` y `coordenadas.csv`.
 
 **NOTA**: Es recomendable que trabajen dentro de un proyecto de RStudio.
 
-# Análisis de componentes principales (PCA)
-
-## Carga de librerias y datos
+# Carga de librerias y datos
 
 ```{r}
+library(BiodiversityR)
 library(factoextra)
+library(tidyverse)
+library(ggplot2)
+library(ggrepel)
+library(GGally)
+library(geosphere)
+
+set.seed(2025)
+
+# Para PCA
+moscas <- read.csv("datos/moscas.csv", header = TRUE, row.names = 1)
+
+# Para CCA
+abundancia <- read.csv("datos/abundancia.csv", header = TRUE, row.names = 1)
+ambiente <- read.csv("datos/ambiente.csv", header = TRUE, row.names = 1)
+
+# Para mantel
+coords <- read.csv("datos/coordenadas.csv", header = TRUE, row.names = 1)
 ```
 
+# Regresión lineal
+
+```{r}
+# Correlaciones
+
+# Matriz
+matriz_cors <- cor(moscas[-1])
+matriz_cors
+
+# Gráfico correlaciones (GGally)
+ggcorr(moscas)
+
+test_correlación <- cor.test(moscas$IHH, moscas$Abund_log)
+test_correlación
+
+regresion <- lm(Abund_log ~ IHH, data = moscas)
+summary(regresion)
+
+# Gráfico
+reglineal_plot <- ggplot(moscas, aes(x = IHH, y = Abund_log)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(
+    formula = y ~ x,
+    method = "lm",
+    color = "black",
+    linewidth = 1,
+    lineend = "round",
+    se = TRUE
+  ) +
+  theme_classic()
+reglineal_plot
+```
+
+# Análisis de componentes principales (PCA)
+
+```{r}
+datos_estandarizados <- scale(moscas[-1])
+
+pca <- prcomp(datos_estandarizados, scale = TRUE)
+summary(pca)
+
+# Gráfico
+plot_pca <- fviz_pca_biplot(pca, label = "var", addEllipses = TRUE, ellipse.level = 0.95, habillage = moscas$Ambiente, palette = "Set2") +
+  theme_classic()
+plot_pca
+```
+
+# Análisis de correspondencia canónica (CCA)
+
+```{r}
+cca0 <- cca(abundancia ~ ., ambiente)
+summary(resultado_cca)
+
+# CCA por pasos
+cca_steps <- ordistep(cca0)
+
+resultado_cca <- cca(formula = abundancia ~ hr_med + hr_min + pp_30_dias_antes, data = ambiente)
+summary(resultado_cca)
+
+anova_cca <- anova.cca(resultado_cca, by = "terms")
+anova_cca
+
+```
+
+## Gráfico
+
+Para graficar la salida de `cca()` no es posible hacerlo directamente con `ggplot`, por lo que primero debemos extraer los datos manualmente.
+
+```{r}
+# Gráficos base
+plot_cca <- plot(resultado_cca)
+elipses_plot_cca <- ordiellipse(resultado_cca, ambiente$estado_conservacion)
+
+# Extracción de datos para graficar
+sitios <- scores(resultado_cca, display = "sites", scaling = 2) %>%
+  as.data.frame() %>%
+  rownames_to_column("label")
+
+especies <- scores(resultado_cca, display = "species", scaling = 2) %>%
+  as.data.frame() %>%
+  rownames_to_column("label")
+
+vectores <- scores(resultado_cca, display = "bp", scaling = 2) %>%
+  as.data.frame() %>%
+  rownames_to_column("label")
+
+elipses <- ordiellipse.long(elipses_plot_cca)
+colnames(elipses) <- c("Grupo", "CCA1", "CCA2")
+```
+
+Ahora si podemos gráficar usando `ggplot`.
+
+```{r}
+# Gráfico
+
+ggplot(especies, aes(x = CCA1, y = CCA2)) +
+  geom_point(alpha = 0.5) +
+  geom_path(data = elipses, aes(color = Grupo)) +
+  geom_segment(
+    data = vectores,
+    aes(x = 0, y = 0, xend = CCA1*2, yend = CCA2*2),
+    arrow = arrow(length = unit(0.02, "npc")),
+    color = "blue"
+  ) +
+  geom_text_repel(
+    data = vectores,
+    aes(x = CCA1*2, y = CCA2*2, label = label),
+    color = "blue",
+    direction = "y"
+  ) +
+  theme_classic()
+```
+
+# Test de Mantel
+
+```{r}
+dist_abundancia <- vegdist(abundancia, method = "bray")
+
+dist_geografica <- as.dist(distm(coords, fun = distHaversine))
+
+resultado_mantel <- mantel(dist_abundancia, dist_geografica, method = "pearson", permutations = 9999)
+resultado_mantel
+```
+
+## Gráfico
+
+Para visualizar los resultados del test de Mantel es posible hacer un gráfico de dispersión.
+
+```{r}
+plot(as.matrix(dist_geografica), as.matrix(dist_abundancia))
+
+dist_abund_vect <- as.vector(dist_abundancia)
+dist_geo_vect <- as.vector(dist_geografica)
+
+puntos_mantel <- data.frame(
+  dist_abund = dist_abund_vect,
+  dist_geo = dist_geo_vect
+)
+
+# Distancias geográficas de 0 a 1
+min_dist <- min(puntos_mantel$dist_geo)
+max_dist <- max(puntos_mantel$dist_geo)
+puntos_mantel$geo_scaled <- (puntos_mantel$dist_geo - min_dist) / (max_dist - min_dist)
+
+ggplot(puntos_mantel, aes(x = geo_scaled, y = dist_abund)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  labs(x = "Distancia geográfica", y = "Distancia de abundancias") +
+  coord_fixed() +
+  theme_classic()
+```

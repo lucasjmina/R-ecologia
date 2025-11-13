@@ -67,7 +67,7 @@ multi_sor
 
 # Jaccard
 multi_jac_df <- data.frame(
-  Componente = c("Total (βjac)", "Recambio (βjtu)", "Anidamiento (βjne)"),
+  Componente = c("Recambio (βjtu)", "Anidamiento (βjne)", "Total (βjac)"),
   Valor = unlist(multi_jac)
 )
 
@@ -81,11 +81,11 @@ ggplot(multi_jac_df, aes(x = Componente, y = Valor, fill = Componente)) +
 
 # Sorenssen
 multi_sor_df <- data.frame(
-  Componente = c("Total (βsor)", "Recambio (βsim)", "Anidamiento (βsne)"),
+  Componente = c("Recambio (βsim)", "Anidamiento (βsne)", "Total (βsor)"),
   Valor = unlist(multi_sor)
 )
 
-ggplot(multi_jac_df, aes(x = Componente, y = Valor, fill = Componente)) +
+ggplot(multi_sor_df, aes(x = Componente, y = Valor, fill = Componente)) +
   geom_col(show.legend = FALSE) +
   geom_text(aes(label = round(Valor, 2)), vjust = -0.5) +
   scale_fill_brewer(palette = "Set2") +
@@ -232,6 +232,12 @@ curva_whitt <- function(datos, grupo, color) {
   plot <- ggplot(x, aes(x = rank, y = abundance)) +
     geom_line(color = color) +
     geom_point(size = 2.5, color = color) +
+    # Muestra los nombres de las primeras tres especies
+    geom_text_repel(
+      data = subset(datos, labelit == TRUE & Grouping == grupo),
+      aes(label = species),
+      force_pull = -0.01
+    ) +
     labs(x = "Rank", y = "Abundancia") +
     theme_classic()
   plot
