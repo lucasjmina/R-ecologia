@@ -7,11 +7,18 @@
     "text": "En esta guia veremos como realizar distintos análisis estadisticos utilizados para comprender como se relacionen variables ambientales con la estructura de la comunidad. Se utilizarand los sets de datos llamados moscas.csv, abundancia.csv, ambiente.csv y coordenadas.csv.\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
   },
   {
-    "objectID": "unidad_04.html#carga-de-librerias-y-datos",
-    "href": "unidad_04.html#carga-de-librerias-y-datos",
+    "objectID": "unidad_04.html#gráfico",
+    "href": "unidad_04.html#gráfico",
     "title": "Unidad 04",
-    "section": "2.1 Carga de librerias y datos",
-    "text": "2.1 Carga de librerias y datos\n\nlibrary(factoextra)"
+    "section": "5.1 Gráfico",
+    "text": "5.1 Gráfico\nPara graficar la salida de cca() no es posible hacerlo directamente con ggplot, por lo que primero debemos extraer los datos manualmente.\n\n# Gráficos base\nplot_cca &lt;- plot(resultado_cca)\nelipses_plot_cca &lt;- ordiellipse(resultado_cca, ambiente$estado_conservacion)\n\n# Extracción de datos para graficar\nsitios &lt;- scores(resultado_cca, display = \"sites\", scaling = 2) %&gt;%\n  as.data.frame() %&gt;%\n  rownames_to_column(\"label\")\n\nespecies &lt;- scores(resultado_cca, display = \"species\", scaling = 2) %&gt;%\n  as.data.frame() %&gt;%\n  rownames_to_column(\"label\")\n\nvectores &lt;- scores(resultado_cca, display = \"bp\", scaling = 2) %&gt;%\n  as.data.frame() %&gt;%\n  rownames_to_column(\"label\")\n\nelipses &lt;- ordiellipse.long(elipses_plot_cca)\ncolnames(elipses) &lt;- c(\"Grupo\", \"CCA1\", \"CCA2\")\n\nAhora si podemos gráficar usando ggplot.\n\n# Gráfico\n\nggplot(especies, aes(x = CCA1, y = CCA2)) +\n  geom_point(alpha = 0.5) +\n  geom_path(data = elipses, aes(color = Grupo)) +\n  geom_segment(\n    data = vectores,\n    aes(x = 0, y = 0, xend = CCA1*2, yend = CCA2*2),\n    arrow = arrow(length = unit(0.02, \"npc\")),\n    color = \"blue\"\n  ) +\n  geom_text_repel(\n    data = vectores,\n    aes(x = CCA1*2, y = CCA2*2, label = label),\n    color = \"blue\",\n    direction = \"y\"\n  ) +\n  theme_classic()"
+  },
+  {
+    "objectID": "unidad_04.html#gráfico-1",
+    "href": "unidad_04.html#gráfico-1",
+    "title": "Unidad 04",
+    "section": "6.1 Gráfico",
+    "text": "6.1 Gráfico\nPara visualizar los resultados del test de Mantel es posible hacer un gráfico de dispersión.\n\nplot(as.matrix(dist_geografica), as.matrix(dist_abundancia))\n\ndist_abund_vect &lt;- as.vector(dist_abundancia)\ndist_geo_vect &lt;- as.vector(dist_geografica)\n\npuntos_mantel &lt;- data.frame(\n  dist_abund = dist_abund_vect,\n  dist_geo = dist_geo_vect\n)\n\n# Distancias geográficas de 0 a 1\nmin_dist &lt;- min(puntos_mantel$dist_geo)\nmax_dist &lt;- max(puntos_mantel$dist_geo)\npuntos_mantel$geo_scaled &lt;- (puntos_mantel$dist_geo - min_dist) / (max_dist - min_dist)\n\nggplot(puntos_mantel, aes(x = geo_scaled, y = dist_abund)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = FALSE, color = \"blue\") +\n  labs(x = \"Distancia geográfica\", y = \"Distancia de abundancias\") +\n  coord_fixed() +\n  theme_classic()"
   },
   {
     "objectID": "unidad_02.html",
@@ -82,19 +89,5 @@
     "title": "Unidad 03",
     "section": "7.1 Gráficos",
     "text": "7.1 Gráficos\n\n# Creamos un data.frame con los resultados\npuntos_nmds &lt;- as.data.frame(resultado_nmds$points)\npuntos_nmds$CONSERVACION &lt;- ambiente$estado_conservacion\n\n# Agregamos siglas para nombres de los sitios y guardamos el valor de stress\npuntos_nmds$SITIO &lt;- abbreviate(rownames(abundancia))\nestres &lt;- paste(\"Stress =\", round(resultado_nmds$stress, 2))\n\n# Graficamos\nplot_nmds &lt;- ggplot(puntos_nmds, aes(x = MDS1, y = MDS2)) +\n  ggtitle(\"NMDS\") +\n  geom_point(aes(shape = CONSERVACION), size = 3) +\n  scale_shape_manual(\n    name = \"\",\n    breaks = c(\"ECB\", \"ECI\", \"ECD\"),\n    labels = c(\"Conservado\", \"Intermedio\", \"Degradado\"),\n    values = c(15, 16, 17)\n  ) +\n  geom_mark_hull(\n    aes(group = CONSERVACION, linetype = CONSERVACION),\n    concavity = 10,\n    radius = 0,\n    expand = 0,\n    show.legend = FALSE\n  ) +\n  scale_linetype_manual(values = c(\"solid\", \"dashed\", \"dotted\")) +\n  annotate(\"text\", x = +Inf, y = +Inf, label = estres, hjust = 1, vjust = 1) +\n  theme_classic()\nplot_nmds\n\n# Opcionalmente podemos añadir el nombre de los sitios\nplot_nmds +\n  geom_text_repel(\n    aes(label = SITIO),\n    box.padding = 0.5,\n    size = 3.5,\n    colour = \"blue\",\n  )"
-  },
-  {
-    "objectID": "unidad_04.html#gráfico",
-    "href": "unidad_04.html#gráfico",
-    "title": "Unidad 04",
-    "section": "5.1 Gráfico",
-    "text": "5.1 Gráfico\nPara graficar la salida de cca() no es posible hacerlo directamente con ggplot, por lo que primero debemos extraer los datos manualmente.\n\n# Gráficos base\nplot_cca &lt;- plot(resultado_cca)\nelipses_plot_cca &lt;- ordiellipse(resultado_cca, ambiente$estado_conservacion)\n\n# Extracción de datos para graficar\nsitios &lt;- scores(resultado_cca, display = \"sites\", scaling = 2) %&gt;%\n  as.data.frame() %&gt;%\n  rownames_to_column(\"label\")\n\nespecies &lt;- scores(resultado_cca, display = \"species\", scaling = 2) %&gt;%\n  as.data.frame() %&gt;%\n  rownames_to_column(\"label\")\n\nvectores &lt;- scores(resultado_cca, display = \"bp\", scaling = 2) %&gt;%\n  as.data.frame() %&gt;%\n  rownames_to_column(\"label\")\n\nelipses &lt;- ordiellipse.long(elipses_plot_cca)\ncolnames(elipses) &lt;- c(\"Grupo\", \"CCA1\", \"CCA2\")\n\nAhora si podemos gráficar usando ggplot.\n\n# Gráfico\n\nggplot(especies, aes(x = CCA1, y = CCA2)) +\n  geom_point(alpha = 0.5) +\n  geom_path(data = elipses, aes(color = Grupo)) +\n  geom_segment(\n    data = vectores,\n    aes(x = 0, y = 0, xend = CCA1*2, yend = CCA2*2),\n    arrow = arrow(length = unit(0.02, \"npc\")),\n    color = \"blue\"\n  ) +\n  geom_text_repel(\n    data = vectores,\n    aes(x = CCA1*2, y = CCA2*2, label = label),\n    color = \"blue\",\n    direction = \"y\"\n  ) +\n  theme_classic()"
-  },
-  {
-    "objectID": "unidad_04.html#gráfico-1",
-    "href": "unidad_04.html#gráfico-1",
-    "title": "Unidad 04",
-    "section": "6.1 Gráfico",
-    "text": "6.1 Gráfico\nPara visualizar los resultados del test de Mantel es posible hacer un gráfico de dispersión.\n\nplot(as.matrix(dist_geografica), as.matrix(dist_abundancia))\n\ndist_abund_vect &lt;- as.vector(dist_abundancia)\ndist_geo_vect &lt;- as.vector(dist_geografica)\n\npuntos_mantel &lt;- data.frame(\n  dist_abund = dist_abund_vect,\n  dist_geo = dist_geo_vect\n)\n\n# Distancias geográficas de 0 a 1\nmin_dist &lt;- min(puntos_mantel$dist_geo)\nmax_dist &lt;- max(puntos_mantel$dist_geo)\npuntos_mantel$geo_scaled &lt;- (puntos_mantel$dist_geo - min_dist) / (max_dist - min_dist)\n\nggplot(puntos_mantel, aes(x = geo_scaled, y = dist_abund)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = FALSE, color = \"blue\") +\n  labs(x = \"Distancia geográfica\", y = \"Distancia de abundancias\") +\n  coord_fixed() +\n  theme_classic()"
   }
 ]

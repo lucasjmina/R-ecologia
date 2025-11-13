@@ -11,6 +11,8 @@ website:
         href: unidad_02.qmd
       - text: "Unidad 03"
         href: unidad_03.qmd
+      - text: "Unidad 04"
+        href: unidad_04.qmd
 
 execute:
   output: false
