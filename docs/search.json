@@ -95,7 +95,7 @@
     "href": "unidad_05.html",
     "title": "Unidad 05",
     "section": "",
-    "text": "En esta guía se veran distintas pruebas de hipótesis estadisticas, tanto parametricas como no parametricas. Se utilizará el set de hormigas hormigas.csv y moscas.csv"
+    "text": "En esta guía se veran distintas pruebas de hipótesis estadisticas, tanto parametricas como no parametricas. Se utilizará el set de hormigas hormigas.csv, moscas.csv, abundancia.csv y ambiente.csv"
   },
   {
     "objectID": "unidad_05.html#prueba-t-de-student",
