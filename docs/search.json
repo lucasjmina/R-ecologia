@@ -4,7 +4,7 @@
     "href": "unidad_04.html",
     "title": "Unidad 04",
     "section": "",
-    "text": "En esta guia veremos como realizar distintos análisis estadisticos utilizados para comprender como se relacionen variables ambientales con la estructura de la comunidad. Se utilizarand los sets de datos llamados moscas.csv, abundancia.csv, ambiente.csv y coordenadas.csv.\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
+    "text": "En esta guia veremos como realizar distintos análisis estadisticos utilizados para comprender como se relacionen variables ambientales con la estructura de la comunidad. Se utilizaran los sets de datos llamados moscas.csv, abundancia.csv, ambiente.csv y coordenadas.csv.\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
   },
   {
     "objectID": "unidad_04.html#gráfico",
@@ -89,5 +89,61 @@
     "title": "Unidad 03",
     "section": "7.1 Gráficos",
     "text": "7.1 Gráficos\n\n# Creamos un data.frame con los resultados\npuntos_nmds &lt;- as.data.frame(resultado_nmds$points)\npuntos_nmds$CONSERVACION &lt;- ambiente$estado_conservacion\n\n# Agregamos siglas para nombres de los sitios y guardamos el valor de stress\npuntos_nmds$SITIO &lt;- abbreviate(rownames(abundancia))\nestres &lt;- paste(\"Stress =\", round(resultado_nmds$stress, 2))\n\n# Graficamos\nplot_nmds &lt;- ggplot(puntos_nmds, aes(x = MDS1, y = MDS2)) +\n  ggtitle(\"NMDS\") +\n  geom_point(aes(shape = CONSERVACION), size = 3) +\n  scale_shape_manual(\n    name = \"\",\n    breaks = c(\"ECB\", \"ECI\", \"ECD\"),\n    labels = c(\"Conservado\", \"Intermedio\", \"Degradado\"),\n    values = c(15, 16, 17)\n  ) +\n  geom_mark_hull(\n    aes(group = CONSERVACION, linetype = CONSERVACION),\n    concavity = 10,\n    radius = 0,\n    expand = 0,\n    show.legend = FALSE\n  ) +\n  scale_linetype_manual(values = c(\"solid\", \"dashed\", \"dotted\")) +\n  annotate(\"text\", x = +Inf, y = +Inf, label = estres, hjust = 1, vjust = 1) +\n  theme_classic()\nplot_nmds\n\n# Opcionalmente podemos añadir el nombre de los sitios\nplot_nmds +\n  geom_text_repel(\n    aes(label = SITIO),\n    box.padding = 0.5,\n    size = 3.5,\n    colour = \"blue\",\n  )"
+  },
+  {
+    "objectID": "unidad_05.html",
+    "href": "unidad_05.html",
+    "title": "Unidad 05",
+    "section": "",
+    "text": "En esta guía se veran distintas pruebas de hipótesis estadisticas, tanto parametricas como no parametricas. Se utilizará el set de hormigas hormigas.csv y moscas.csv"
+  },
+  {
+    "objectID": "unidad_05.html#prueba-t-de-student",
+    "href": "unidad_05.html#prueba-t-de-student",
+    "title": "Unidad 05",
+    "section": "4.1 Prueba T de Student",
+    "text": "4.1 Prueba T de Student\n\ngrupo1 &lt;- hormigas$Taxa_S[hormigas$TRATAMIENTO == \"ECB\"]\ngrupo2 &lt;- hormigas$Taxa_S[hormigas$TRATAMIENTO == \"ECD\"]\n\nres_ttest &lt;- t.test(grupo1, grupo2)\nres_ttest"
+  },
+  {
+    "objectID": "unidad_05.html#anova",
+    "href": "unidad_05.html#anova",
+    "title": "Unidad 05",
+    "section": "4.2 ANOVA",
+    "text": "4.2 ANOVA\n\nmodelo_anova &lt;- aov(Taxa_S ~ TRATAMIENTO, data = hormigas)\nsummary(modelo_anova)\n\n# Ver diferencias entre grupos\nemms &lt;- emmeans(modelo_anova, specs = ~ TRATAMIENTO)\nemms\n\npairs(emms)"
+  },
+  {
+    "objectID": "unidad_05.html#manova",
+    "href": "unidad_05.html#manova",
+    "title": "Unidad 05",
+    "section": "4.3 MANOVA",
+    "text": "4.3 MANOVA\n\nmodelo_manova &lt;- manova(cbind(Taxa_S, INCIDENCIA) ~ TRATAMIENTO, data = hormigas)\nsummary(modelo_manova)"
+  },
+  {
+    "objectID": "unidad_05.html#pruena-de-mann-whitney-u",
+    "href": "unidad_05.html#pruena-de-mann-whitney-u",
+    "title": "Unidad 05",
+    "section": "5.1 Pruena de Mann-Whitney U",
+    "text": "5.1 Pruena de Mann-Whitney U\n\necb_vs_ecd &lt;- subset(hormigas, TRATAMIENTO %in% c(\"ECB\", \"ECD\"))\n\ntest_whitney &lt;- wilcox.test(D2 ~ TRATAMIENTO, data = ecb_vs_ecd)\ntest_whitney"
+  },
+  {
+    "objectID": "unidad_05.html#prueba-de-kruskal-wallis",
+    "href": "unidad_05.html#prueba-de-kruskal-wallis",
+    "title": "Unidad 05",
+    "section": "5.2 Prueba de Kruskal-Wallis",
+    "text": "5.2 Prueba de Kruskal-Wallis\n\ntest_kruskal &lt;- kruskal.test(D2 ~ TRATAMIENTO, data = hormigas)\ntest_kruskal"
+  },
+  {
+    "objectID": "unidad_05.html#prueba-de-correlación-de-spearman",
+    "href": "unidad_05.html#prueba-de-correlación-de-spearman",
+    "title": "Unidad 05",
+    "section": "5.3 Prueba de correlación de Spearman",
+    "text": "5.3 Prueba de correlación de Spearman\n\nspearman_cor &lt;- cor.test(moscas$Div_Shan, moscas$IHH, method = \"spearman\")\nspearman_cor"
+  },
+  {
+    "objectID": "unidad_05.html#permanova",
+    "href": "unidad_05.html#permanova",
+    "title": "Unidad 05",
+    "section": "5.4 PERMANOVA",
+    "text": "5.4 PERMANOVA\n\ndist_abundancia &lt;- vegdist(abundancia, method = \"bray\")\n\nres_permanova &lt;- adonis2(dist_abundancia ~ estado_conservacion, data = ambiente, permutations = 999)\nres_permanova\n\nmodelo_betadisp &lt;- betadisper(dist_abundancia, group = ambiente$estado_conservacion)\nanova(modelo_betadisp)"
   }
 ]

@@ -8,7 +8,7 @@ format:
 
 # Introducción
 
-En esta guia veremos como realizar distintos análisis estadisticos utilizados para comprender como se relacionen variables ambientales con la estructura de la comunidad. Se utilizarand los sets de datos llamados `moscas.csv`, `abundancia.csv`, `ambiente.csv` y `coordenadas.csv`.
+En esta guia veremos como realizar distintos análisis estadisticos utilizados para comprender como se relacionen variables ambientales con la estructura de la comunidad. Se utilizaran los sets de datos llamados `moscas.csv`, `abundancia.csv`, `ambiente.csv` y `coordenadas.csv`.
 
 **NOTA**: Es recomendable que trabajen dentro de un proyecto de RStudio.
 
