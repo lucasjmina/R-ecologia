@@ -1,149 +1,149 @@
 [
   {
-    "objectID": "unidad_04.html",
-    "href": "unidad_04.html",
-    "title": "Unidad 04",
-    "section": "",
-    "text": "En esta guia veremos como realizar distintos análisis estadisticos utilizados para comprender como se relacionen variables ambientales con la estructura de la comunidad. Se utilizaran los sets de datos llamados moscas.csv, abundancia.csv, ambiente.csv y coordenadas.csv.\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
-  },
-  {
-    "objectID": "unidad_04.html#gráfico",
-    "href": "unidad_04.html#gráfico",
-    "title": "Unidad 04",
-    "section": "5.1 Gráfico",
-    "text": "5.1 Gráfico\nPara graficar la salida de cca() no es posible hacerlo directamente con ggplot, por lo que primero debemos extraer los datos manualmente.\n\n# Gráficos base\nplot_cca &lt;- plot(resultado_cca)\nelipses_plot_cca &lt;- ordiellipse(resultado_cca, ambiente$estado_conservacion)\n\n# Extracción de datos para graficar\nsitios &lt;- scores(resultado_cca, display = \"sites\", scaling = 2) %&gt;%\n  as.data.frame() %&gt;%\n  rownames_to_column(\"label\")\n\nespecies &lt;- scores(resultado_cca, display = \"species\", scaling = 2) %&gt;%\n  as.data.frame() %&gt;%\n  rownames_to_column(\"label\")\n\nvectores &lt;- scores(resultado_cca, display = \"bp\", scaling = 2) %&gt;%\n  as.data.frame() %&gt;%\n  rownames_to_column(\"label\")\n\nelipses &lt;- ordiellipse.long(elipses_plot_cca)\ncolnames(elipses) &lt;- c(\"Grupo\", \"CCA1\", \"CCA2\")\n\nAhora si podemos gráficar usando ggplot.\n\n# Gráfico\n\nggplot(especies, aes(x = CCA1, y = CCA2)) +\n  geom_hline(yintercept = 0, linetype = \"dashed\", color = \"grey\") +\n  geom_vline(xintercept = 0, linetype = \"dashed\", color = \"grey\") +\n  geom_point(alpha = 0.5) +\n  geom_path(data = elipses, aes(color = Grupo)) +\n  geom_segment(\n    data = vectores,\n    aes(x = 0, y = 0, xend = CCA1*2, yend = CCA2*2),\n    arrow = arrow(length = unit(0.02, \"npc\")),\n    color = \"blue\"\n  ) +\n  geom_text_repel(\n    data = vectores,\n    aes(x = CCA1*2, y = CCA2*2, label = label),\n    color = \"blue\",\n    direction = \"y\"\n  ) +\n  theme_classic()"
-  },
-  {
-    "objectID": "unidad_04.html#gráfico-1",
-    "href": "unidad_04.html#gráfico-1",
-    "title": "Unidad 04",
-    "section": "6.1 Gráfico",
-    "text": "6.1 Gráfico\nPara visualizar los resultados del test de Mantel es posible hacer un gráfico de dispersión.\n\nplot(as.matrix(dist_geografica), as.matrix(dist_abundancia))\n\ndist_abund_vect &lt;- as.vector(dist_abundancia)\ndist_geo_vect &lt;- as.vector(dist_geografica)\n\npuntos_mantel &lt;- data.frame(\n  dist_abund = dist_abund_vect,\n  dist_geo = dist_geo_vect\n)\n\n# Distancias geográficas de 0 a 1\nmin_dist &lt;- min(puntos_mantel$dist_geo)\nmax_dist &lt;- max(puntos_mantel$dist_geo)\npuntos_mantel$geo_scaled &lt;- (puntos_mantel$dist_geo - min_dist) / (max_dist - min_dist)\n\nggplot(puntos_mantel, aes(x = geo_scaled, y = dist_abund)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = FALSE, color = \"blue\") +\n  labs(x = \"Distancia geográfica\", y = \"Distancia de abundancias\") +\n  coord_fixed() +\n  theme_classic()"
-  },
-  {
-    "objectID": "unidad_02.html",
-    "href": "unidad_02.html",
-    "title": "Unidad 02",
-    "section": "",
-    "text": "En esta guí se verá como calcular indices de diversidad funcional y diversidad taxonómica. Se utilizaran los sets de datos llamados abun_hormigas.csv, categ_hormigas.csv, medidas_hormigas.csv, abundancia.csv y taxa.csv.\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
-  },
-  {
-    "objectID": "unidad_02.html#gráficos",
-    "href": "unidad_02.html#gráficos",
-    "title": "Unidad 02",
-    "section": "4.1 Gráficos",
-    "text": "4.1 Gráficos\n\n# Transformamos las tablas a formato largo para ggplot\ndiv_medidas_long  &lt;- tb_div_medidas %&gt;%\n  pivot_longer(\n    ECB:ECD,\n    names_to = \"Ambiente\",\n    values_to = \"val\"\n  ) %&gt;%\n  mutate(Ambiente = factor(Ambiente, levels = c(\"ECB\", \"ECI\", \"ECD\")))\n\ndiv_categs_long  &lt;- tb_div_categs %&gt;%\n  pivot_longer(\n    ECB:ECD,\n    names_to = \"Ambiente\",\n    values_to = \"val\"\n  ) %&gt;%\n  mutate(Ambiente = factor(Ambiente, levels = c(\"ECB\", \"ECI\", \"ECD\")))\n\n# Gráfico diversidad rasgos continuos\ndiv_medidas_plot &lt;- ggplot(div_medidas_long, aes(x = Ambiente, y = val, fill = Ambiente)) +\n  ylab(\"\") +\n  xlab(\"\") +\n  geom_col(show.legend = FALSE) +\n  scale_fill_manual(values = c(\"#20854E\", \"#E18727\", \"#BC3C29\")) +\n  scale_y_continuous(expand = c(0, 0)) +\n  facet_wrap(Index ~ ., scale = \"free\", axes = \"all\", ncol = 2, strip.position = \"left\") +\n  theme_classic() +\n  theme(strip.placement = \"outside\", strip.background = element_blank())\ndiv_medidas_plot\n\n#Gráfico diversidad rasgos categoricos\ndiv_categs_plot &lt;- ggplot(div_categs_long, aes(x = Ambiente, y = val, fill = Ambiente)) +\n  ylab(\"\") +\n  xlab(\"\") +\n  geom_col(show.legend = FALSE) +\n  scale_fill_manual(values = c(\"#20854E\", \"#E18727\", \"#BC3C29\")) +\n  scale_y_continuous(expand = c(0, 0)) +\n  facet_wrap(Index ~ ., scale = \"free\", axes = \"all\", ncol = 2, strip.position = \"left\") +\n  theme_classic() +\n  theme(strip.placement = \"outside\", strip.background = element_blank())\ndiv_categs_plot\n\n# Guardamos los gráficos\nggsave(\"graficos/diversidad_medidas.png\", div_medidas_plot, dpi = 300, width = 2000, height = 2000, units = \"px\")\nggsave(\"graficos/diversidad_categorias.png\", div_categs_plot, dpi = 300, width = 2000, height = 2000, units = \"px\")"
-  },
-  {
-    "objectID": "unidad_02.html#gráfico",
-    "href": "unidad_02.html#gráfico",
-    "title": "Unidad 02",
-    "section": "5.1 Gráfico",
-    "text": "5.1 Gráfico\n\n# Transdormamos los resultados a una data.frame\ndiv_taxonomica &lt;- as.data.frame(\n  do.call(cbind, div_taxonomica)\n)\n\ndiv_taxa_plot &lt;- ggplot(div_taxonomica, aes(x = Species, y = Dplus)) +\n  geom_point() +\n  ylab(\"Δ+\") +\n  xlab(\"Riqueza\") +\n  geom_hline(aes(yintercept = EDplus), linetype = \"dotted\") +\n  geom_ribbon(aes(ymax = EDplus + sd.Dplus * 2, ymin = EDplus - sd.Dplus * 2), fill = NA, color = \"black\") +\n  geom_text_repel(aes(label = row.names(div_taxonomica)), size = 3.5, color = \"blue3\") +\n  theme_classic()\ndiv_taxa_plot\nggsave(\"graficos/div_taxonomica.png\", div_taxa_plot, dpi = 300, width = 2000, height = 2000, units = \"px\")"
-  },
-  {
-    "objectID": "unidad_01.html",
-    "href": "unidad_01.html",
-    "title": "Unidad 01",
-    "section": "",
-    "text": "En esta guía veremos como calcular distintos índices de diversidad alfa cómo Shannon, Simpson y diversidad verdadera. Así como estimadores: Chao, Jacknife, ACE e ICE. Se utilizaran los set de datos llamados abundancia_tratamiento.csv y abundancia_conservacion_larga.csv\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
-  },
-  {
-    "objectID": "unidad_01.html#ace-e-ice",
-    "href": "unidad_01.html#ace-e-ice",
-    "title": "Unidad 01",
-    "section": "4.1 ACE e ICE",
-    "text": "4.1 ACE e ICE\nEstas funciones del paquete fossil calculan los estimadores para todos los sitios, por lo tanto para calcularlos por grupo debemos hacerlo manualmente.\n\nace_ice &lt;- pivot_longer(\n  datos,\n  Acanthoponera.mucronata:Gnamptogenys.sulcata,\n  values_to = \"abund\"\n) %&gt;% \n  reframe(\n    .by = estadoConservacion,\n    ACE = fossil::ACE(abund),\n    ICE = fossil::ICE(abund)\n  ) %&gt;%\n  unique()\nace_ice"
-  },
-  {
-    "objectID": "unidad_03.html",
-    "href": "unidad_03.html",
-    "title": "Unidad 03",
-    "section": "",
-    "text": "Aquí veremos distintas formas de medir y representar la estructura de una comunidad. Se utilizaran los datasets abundancia.csv, ambiente.csv, abundancia_conservacion.csv y abundancia_conservacion_larga.csv.\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
-  },
-  {
-    "objectID": "unidad_03.html#dismilitud-entre-multiples-sitios",
-    "href": "unidad_03.html#dismilitud-entre-multiples-sitios",
-    "title": "Unidad 03",
-    "section": "3.1 Dismilitud entre multiples sitios",
-    "text": "3.1 Dismilitud entre multiples sitios\nCalcula el recambio (turnover) y anidamiento (nestedness) de especies entre todos los sitios.\n\n## En base Jaccard\nmulti_jac &lt;- beta.multi(div_beta, index.family = \"jac\")\nmulti_jac\n\n## En base Sørensen\nmulti_sor &lt;- beta.multi(div_beta, index.family = \"sor\")\nmulti_sor\n\n## Gráficos\n\n# Jaccard\nmulti_jac_df &lt;- data.frame(\n  Componente = c(\"Recambio (βjtu)\", \"Anidamiento (βjne)\", \"Total (βjac)\"),\n  Valor = unlist(multi_jac)\n)\n\nggplot(multi_jac_df, aes(x = Componente, y = Valor, fill = Componente)) +\n  geom_col(show.legend = FALSE) +\n  geom_text(aes(label = round(Valor, 2)), vjust = -0.5) +\n  scale_fill_brewer(palette = \"Set2\") +\n  labs(y = \"Disimilitud\", x = \"Componente\") +\n  ylim(0, 1) +\n  theme_classic()\n\n# Sorenssen\nmulti_sor_df &lt;- data.frame(\n  Componente = c(\"Recambio (βsim)\", \"Anidamiento (βsne)\", \"Total (βsor)\"),\n  Valor = unlist(multi_sor)\n)\n\nggplot(multi_sor_df, aes(x = Componente, y = Valor, fill = Componente)) +\n  geom_col(show.legend = FALSE) +\n  geom_text(aes(label = round(Valor, 2)), vjust = -0.5) +\n  scale_fill_brewer(palette = \"Set2\") +\n  labs(y = \"Disimilitud\", x = \"Componente\") +\n  ylim(0, 1) +\n  theme_classic()"
-  },
-  {
-    "objectID": "unidad_03.html#disimilitud-entre-pares",
-    "href": "unidad_03.html#disimilitud-entre-pares",
-    "title": "Unidad 03",
-    "section": "3.2 Disimilitud entre pares",
-    "text": "3.2 Disimilitud entre pares\nCalcula la disimitud entre pares de sitios, generando una matriz de distancias. Para visualizar estas distancias realizaremos un gráfico de cluster.\n\n# Base Jaccard\npair_jac &lt;- beta.pair(div_beta, index.family = \"jac\")\npair_jac\n\n# Base Sorensen\npair_sor &lt;- beta.pair(div_beta, index.family = \"sor\")\npair_sor\n\n## Gráficos\n\n# Se crean los objetos hclust\nhclust_jac &lt;- hcut(pair_jac$beta.jac, hc_method = \"average\", hc_func = \"hclust\")\nhclust_sor &lt;- hcut(pair_sor$beta.sor, hc_method = \"average\", hc_func = \"hclust\")\n\n# Cluster Jaccard\nfviz_dend(hclust_jac, palette = \"Set2\", horiz = TRUE, main = \"Dendograma Jaccard\")\n\n# Cluster Sorensen\nfviz_dend(hclust_sor, palette = \"Set2\", horiz = TRUE, main = \"Dendograma Sorensen\")\n\n# Gráficos de barras apiladas\n# \n# Transformamos los datos en formato largo para ggplot\n\npairs_pivot &lt;- function(datos, nombre_columna) {\n  as.matrix(datos) %&gt;%\n    as.data.frame() %&gt;%\n    rownames_to_column(\"grupo1\") %&gt;%\n    pivot_longer(\n      !grupo1,\n      names_to = \"grupo2\",\n      values_to = nombre_columna\n    ) %&gt;%\n    filter(grupo1 &lt; grupo2) %&gt;%\n    mutate(sitios = paste(grupo1, grupo2, sep = \"-\")) %&gt;%\n    select(sitios, nombre_columna)\n}\n\n## Base Jaccard\nbeta_jtu &lt;- pairs_pivot(pair_jac$beta.jtu, \"βjtu\")\nbeta_jne &lt;- pairs_pivot(pair_jac$beta.jne, \"βjne\")\n\n# Unimos los componentes en una sola tabla\npair_jac_long &lt;- left_join(beta_jtu, beta_jne, by = \"sitios\") %&gt;%\n  pivot_longer(!sitios, names_to = \"Componente\", values_to = \"Valor\") %&gt;%\n  mutate(Componente = factor(Componente, levels = c(\"βjne\", \"βjtu\")))\npair_jac_long\n\n## Base Sorensen\nbeta_sim &lt;- pairs_long(pair_sor$beta.sim, \"βsim\")\nbeta_sne &lt;- pairs_long(pair_sor$beta.sne, \"βsne\")\n\n# Unimos los componentes en una sola tabla\npair_sor_long &lt;- left_join(beta_sne, beta_sim, by = \"sitios\") %&gt;%\n  pivot_longer(!sitios, names_to = \"Componente\", values_to = \"Valor\") %&gt;%\n  mutate(Componente = factor(Componente, levels = c(\"βsne\", \"βsim\")))\npair_sor_long\n\n# Gráfico Jaccard\nplot_pairs_jac &lt;- ggplot(pair_jac_long, aes(x = sitios, y = Valor, fill = Componente)) +\n  geom_bar(stat = \"identity\", color = \"black\", width = 0.6) +\n  scale_fill_brewer(palette = \"Set3\") +\n  geom_label(\n    aes(label = round(Valor, 2)),\n    position = position_stack(vjust = 0.5),\n    size = 3,\n    color = \"grey20\",\n    show.legend = FALSE,\n  ) +\n  labs(\n    x = \"\",\n    y = expression(beta[\"JAC\"]),\n    fill = \"Componente\",\n    title = \"Partición de la diversidad beta\\n(índice de Jaccard)\"\n  ) +\n  theme_classic(base_size = 13) +\n  theme(\n    legend.position = \"bottom\",\n    panel.grid.major.x = element_blank(),\n    panel.grid.minor = element_blank(),\n    axis.text = element_text(color = \"black\")\n  )\nplot_pairs_jac\n\n# Gráfico Sorensen\nplot_pairs_sor &lt;- ggplot(pair_sor_long, aes(x = sitios, y = Valor, fill = Componente)) +\n  geom_bar(stat = \"identity\", color = \"black\", width = 0.6) +\n  scale_fill_brewer(palette = \"Set3\", breaks = c(\"βsim\", \"βsne\")) +\n  geom_label(\n    aes(label = round(Valor, 2)),\n    position = position_stack(vjust = 0.5),\n    size = 3,\n    color = \"grey20\",\n    show.legend = FALSE,\n  ) +\n  labs(\n    x = \"\",\n    y = expression(beta[\"SOR\"]),\n    fill = \"Componente\",\n    title = \"Partición de la diversidad beta\\n(índice de Sorensen)\"\n  ) +\n  theme_classic(base_size = 13) +\n  theme(\n    legend.position = \"bottom\",\n    panel.grid.major.x = element_blank(),\n    panel.grid.minor = element_blank(),\n    axis.text = element_text(color = \"black\")\n  )\nplot_pairs_sor\n\nEstos gráficos están basados en ggplot, así que es posible personalizarlos como cualquier otro gráfico de ggplot."
-  },
-  {
-    "objectID": "unidad_03.html#gráficos",
-    "href": "unidad_03.html#gráficos",
-    "title": "Unidad 03",
-    "section": "6.1 Gráficos",
-    "text": "6.1 Gráficos\n\n# Gráficos por tratamiento\nplot_ec &lt;- ggiNEXT(rarefaccion, type = 1, facet.var = \"Assemblage\") +\n  theme_classic(base_size = 10) +\n  theme(legend.position = \"bottom\")\nplot_ec\n\n# Gráficos por orden q\nplot_orderq &lt;- ggiNEXT(rarefaccion, type = 1, facet.var = \"Order.q\") +\n  theme_classic(base_size = 10) +\n  theme(legend.position = \"bottom\")\nplot_orderq"
-  },
-  {
-    "objectID": "unidad_03.html#gráficos-1",
-    "href": "unidad_03.html#gráficos-1",
-    "title": "Unidad 03",
-    "section": "7.1 Gráficos",
-    "text": "7.1 Gráficos\n\n# Creamos un data.frame con los resultados\npuntos_nmds &lt;- as.data.frame(resultado_nmds$points)\npuntos_nmds$CONSERVACION &lt;- ambiente$estado_conservacion\n\n# Agregamos siglas para nombres de los sitios y guardamos el valor de stress\npuntos_nmds$SITIO &lt;- abbreviate(rownames(abundancia))\nestres &lt;- paste(\"Stress =\", round(resultado_nmds$stress, 2))\n\n# Graficamos\nplot_nmds &lt;- ggplot(puntos_nmds, aes(x = MDS1, y = MDS2)) +\n  ggtitle(\"NMDS\") +\n  geom_point(aes(shape = CONSERVACION), size = 3) +\n  scale_shape_manual(\n    name = \"\",\n    breaks = c(\"ECB\", \"ECI\", \"ECD\"),\n    labels = c(\"Conservado\", \"Intermedio\", \"Degradado\"),\n    values = c(15, 16, 17)\n  ) +\n  geom_mark_hull(\n    aes(group = CONSERVACION, linetype = CONSERVACION),\n    concavity = 10,\n    radius = 0,\n    expand = 0,\n    show.legend = FALSE\n  ) +\n  scale_linetype_manual(values = c(\"solid\", \"dashed\", \"dotted\")) +\n  annotate(\"text\", x = +Inf, y = +Inf, label = estres, hjust = 1, vjust = 1) +\n  theme_classic()\nplot_nmds\n\n# Opcionalmente podemos añadir el nombre de los sitios\nplot_nmds +\n  geom_text_repel(\n    aes(label = SITIO),\n    box.padding = 0.5,\n    size = 3.5,\n    colour = \"blue\",\n  )"
-  },
-  {
-    "objectID": "unidad_05.html",
-    "href": "unidad_05.html",
+    "objectID": "unidades/unidad_05.html",
+    "href": "unidades/unidad_05.html",
     "title": "Unidad 05",
     "section": "",
     "text": "En esta guía se veran distintas pruebas de hipótesis estadisticas, tanto parametricas como no parametricas. Se utilizará el set de hormigas hormigas.csv, moscas.csv, abundancia.csv y ambiente.csv"
   },
   {
-    "objectID": "unidad_05.html#prueba-t-de-student",
-    "href": "unidad_05.html#prueba-t-de-student",
+    "objectID": "unidades/unidad_05.html#prueba-t-de-student",
+    "href": "unidades/unidad_05.html#prueba-t-de-student",
     "title": "Unidad 05",
     "section": "4.1 Prueba T de Student",
     "text": "4.1 Prueba T de Student\n\ngrupo1 &lt;- hormigas$Taxa_S[hormigas$TRATAMIENTO == \"ECB\"]\ngrupo2 &lt;- hormigas$Taxa_S[hormigas$TRATAMIENTO == \"ECD\"]\n\nres_ttest &lt;- t.test(grupo1, grupo2)\nres_ttest"
   },
   {
-    "objectID": "unidad_05.html#anova",
-    "href": "unidad_05.html#anova",
+    "objectID": "unidades/unidad_05.html#anova",
+    "href": "unidades/unidad_05.html#anova",
     "title": "Unidad 05",
     "section": "4.2 ANOVA",
     "text": "4.2 ANOVA\n\nmodelo_anova &lt;- aov(Taxa_S ~ TRATAMIENTO, data = hormigas)\nsummary(modelo_anova)\n\n# Ver diferencias entre grupos\nemms &lt;- emmeans(modelo_anova, specs = ~ TRATAMIENTO)\nemms\n\npairs(emms)"
   },
   {
-    "objectID": "unidad_05.html#manova",
-    "href": "unidad_05.html#manova",
+    "objectID": "unidades/unidad_05.html#manova",
+    "href": "unidades/unidad_05.html#manova",
     "title": "Unidad 05",
     "section": "4.3 MANOVA",
     "text": "4.3 MANOVA\n\nmodelo_manova &lt;- manova(cbind(Taxa_S, INCIDENCIA) ~ TRATAMIENTO, data = hormigas)\nsummary(modelo_manova)"
   },
   {
-    "objectID": "unidad_05.html#pruena-de-mann-whitney-u",
-    "href": "unidad_05.html#pruena-de-mann-whitney-u",
+    "objectID": "unidades/unidad_05.html#pruena-de-mann-whitney-u",
+    "href": "unidades/unidad_05.html#pruena-de-mann-whitney-u",
     "title": "Unidad 05",
     "section": "5.1 Pruena de Mann-Whitney U",
     "text": "5.1 Pruena de Mann-Whitney U\n\necb_vs_ecd &lt;- subset(hormigas, TRATAMIENTO %in% c(\"ECB\", \"ECD\"))\n\ntest_whitney &lt;- wilcox.test(D2 ~ TRATAMIENTO, data = ecb_vs_ecd)\ntest_whitney"
   },
   {
-    "objectID": "unidad_05.html#prueba-de-kruskal-wallis",
-    "href": "unidad_05.html#prueba-de-kruskal-wallis",
+    "objectID": "unidades/unidad_05.html#prueba-de-kruskal-wallis",
+    "href": "unidades/unidad_05.html#prueba-de-kruskal-wallis",
     "title": "Unidad 05",
     "section": "5.2 Prueba de Kruskal-Wallis",
     "text": "5.2 Prueba de Kruskal-Wallis\n\ntest_kruskal &lt;- kruskal.test(D2 ~ TRATAMIENTO, data = hormigas)\ntest_kruskal"
   },
   {
-    "objectID": "unidad_05.html#prueba-de-correlación-de-spearman",
-    "href": "unidad_05.html#prueba-de-correlación-de-spearman",
+    "objectID": "unidades/unidad_05.html#prueba-de-correlación-de-spearman",
+    "href": "unidades/unidad_05.html#prueba-de-correlación-de-spearman",
     "title": "Unidad 05",
     "section": "5.3 Prueba de correlación de Spearman",
     "text": "5.3 Prueba de correlación de Spearman\n\nspearman_cor &lt;- cor.test(moscas$Div_Shan, moscas$IHH, method = \"spearman\")\nspearman_cor"
   },
   {
-    "objectID": "unidad_05.html#permanova",
-    "href": "unidad_05.html#permanova",
+    "objectID": "unidades/unidad_05.html#permanova",
+    "href": "unidades/unidad_05.html#permanova",
     "title": "Unidad 05",
     "section": "5.4 PERMANOVA",
     "text": "5.4 PERMANOVA\n\ndist_abundancia &lt;- vegdist(abundancia, method = \"bray\")\n\nres_permanova &lt;- adonis2(dist_abundancia ~ estado_conservacion, data = ambiente, permutations = 999)\nres_permanova\n\nmodelo_betadisp &lt;- betadisper(dist_abundancia, group = ambiente$estado_conservacion)\nanova(modelo_betadisp)"
+  },
+  {
+    "objectID": "unidades/unidad_03.html",
+    "href": "unidades/unidad_03.html",
+    "title": "Unidad 03",
+    "section": "",
+    "text": "Aquí veremos distintas formas de medir y representar la estructura de una comunidad. Se utilizaran los datasets abundancia.csv, ambiente.csv, abundancia_conservacion.csv y abundancia_conservacion_larga.csv.\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
+  },
+  {
+    "objectID": "unidades/unidad_03.html#dismilitud-entre-multiples-sitios",
+    "href": "unidades/unidad_03.html#dismilitud-entre-multiples-sitios",
+    "title": "Unidad 03",
+    "section": "3.1 Dismilitud entre multiples sitios",
+    "text": "3.1 Dismilitud entre multiples sitios\nCalcula el recambio (turnover) y anidamiento (nestedness) de especies entre todos los sitios.\n\n## En base Jaccard\nmulti_jac &lt;- beta.multi(div_beta, index.family = \"jac\")\nmulti_jac\n\n## En base Sørensen\nmulti_sor &lt;- beta.multi(div_beta, index.family = \"sor\")\nmulti_sor\n\n## Gráficos\n\n# Jaccard\nmulti_jac_df &lt;- data.frame(\n  Componente = c(\"Recambio (βjtu)\", \"Anidamiento (βjne)\", \"Total (βjac)\"),\n  Valor = unlist(multi_jac)\n)\n\nggplot(multi_jac_df, aes(x = Componente, y = Valor, fill = Componente)) +\n  geom_col(show.legend = FALSE) +\n  geom_text(aes(label = round(Valor, 2)), vjust = -0.5) +\n  scale_fill_brewer(palette = \"Set2\") +\n  labs(y = \"Disimilitud\", x = \"Componente\") +\n  ylim(0, 1) +\n  theme_classic()\n\n# Sorenssen\nmulti_sor_df &lt;- data.frame(\n  Componente = c(\"Recambio (βsim)\", \"Anidamiento (βsne)\", \"Total (βsor)\"),\n  Valor = unlist(multi_sor)\n)\n\nggplot(multi_sor_df, aes(x = Componente, y = Valor, fill = Componente)) +\n  geom_col(show.legend = FALSE) +\n  geom_text(aes(label = round(Valor, 2)), vjust = -0.5) +\n  scale_fill_brewer(palette = \"Set2\") +\n  labs(y = \"Disimilitud\", x = \"Componente\") +\n  ylim(0, 1) +\n  theme_classic()"
+  },
+  {
+    "objectID": "unidades/unidad_03.html#disimilitud-entre-pares",
+    "href": "unidades/unidad_03.html#disimilitud-entre-pares",
+    "title": "Unidad 03",
+    "section": "3.2 Disimilitud entre pares",
+    "text": "3.2 Disimilitud entre pares\nCalcula la disimitud entre pares de sitios, generando una matriz de distancias. Para visualizar estas distancias realizaremos un gráfico de cluster.\n\n# Base Jaccard\npair_jac &lt;- beta.pair(div_beta, index.family = \"jac\")\npair_jac\n\n# Base Sorensen\npair_sor &lt;- beta.pair(div_beta, index.family = \"sor\")\npair_sor\n\n## Gráficos\n\n# Se crean los objetos hclust\nhclust_jac &lt;- hcut(pair_jac$beta.jac, hc_method = \"average\", hc_func = \"hclust\")\nhclust_sor &lt;- hcut(pair_sor$beta.sor, hc_method = \"average\", hc_func = \"hclust\")\n\n# Cluster Jaccard\nfviz_dend(hclust_jac, palette = \"Set2\", horiz = TRUE, main = \"Dendograma Jaccard\")\n\n# Cluster Sorensen\nfviz_dend(hclust_sor, palette = \"Set2\", horiz = TRUE, main = \"Dendograma Sorensen\")\n\n# Gráficos de barras apiladas\n# \n# Transformamos los datos en formato largo para ggplot\n\npairs_pivot &lt;- function(datos, nombre_columna) {\n  as.matrix(datos) %&gt;%\n    as.data.frame() %&gt;%\n    rownames_to_column(\"grupo1\") %&gt;%\n    pivot_longer(\n      !grupo1,\n      names_to = \"grupo2\",\n      values_to = nombre_columna\n    ) %&gt;%\n    filter(grupo1 &lt; grupo2) %&gt;%\n    mutate(sitios = paste(grupo1, grupo2, sep = \"-\")) %&gt;%\n    select(sitios, nombre_columna)\n}\n\n## Base Jaccard\nbeta_jtu &lt;- pairs_pivot(pair_jac$beta.jtu, \"βjtu\")\nbeta_jne &lt;- pairs_pivot(pair_jac$beta.jne, \"βjne\")\n\n# Unimos los componentes en una sola tabla\npair_jac_long &lt;- left_join(beta_jtu, beta_jne, by = \"sitios\") %&gt;%\n  pivot_longer(!sitios, names_to = \"Componente\", values_to = \"Valor\") %&gt;%\n  mutate(Componente = factor(Componente, levels = c(\"βjne\", \"βjtu\")))\npair_jac_long\n\n## Base Sorensen\nbeta_sim &lt;- pairs_long(pair_sor$beta.sim, \"βsim\")\nbeta_sne &lt;- pairs_long(pair_sor$beta.sne, \"βsne\")\n\n# Unimos los componentes en una sola tabla\npair_sor_long &lt;- left_join(beta_sne, beta_sim, by = \"sitios\") %&gt;%\n  pivot_longer(!sitios, names_to = \"Componente\", values_to = \"Valor\") %&gt;%\n  mutate(Componente = factor(Componente, levels = c(\"βsne\", \"βsim\")))\npair_sor_long\n\n# Gráfico Jaccard\nplot_pairs_jac &lt;- ggplot(pair_jac_long, aes(x = sitios, y = Valor, fill = Componente)) +\n  geom_bar(stat = \"identity\", color = \"black\", width = 0.6) +\n  scale_fill_brewer(palette = \"Set3\") +\n  geom_label(\n    aes(label = round(Valor, 2)),\n    position = position_stack(vjust = 0.5),\n    size = 3,\n    color = \"grey20\",\n    show.legend = FALSE,\n  ) +\n  labs(\n    x = \"\",\n    y = expression(beta[\"JAC\"]),\n    fill = \"Componente\",\n    title = \"Partición de la diversidad beta\\n(índice de Jaccard)\"\n  ) +\n  theme_classic(base_size = 13) +\n  theme(\n    legend.position = \"bottom\",\n    panel.grid.major.x = element_blank(),\n    panel.grid.minor = element_blank(),\n    axis.text = element_text(color = \"black\")\n  )\nplot_pairs_jac\n\n# Gráfico Sorensen\nplot_pairs_sor &lt;- ggplot(pair_sor_long, aes(x = sitios, y = Valor, fill = Componente)) +\n  geom_bar(stat = \"identity\", color = \"black\", width = 0.6) +\n  scale_fill_brewer(palette = \"Set3\", breaks = c(\"βsim\", \"βsne\")) +\n  geom_label(\n    aes(label = round(Valor, 2)),\n    position = position_stack(vjust = 0.5),\n    size = 3,\n    color = \"grey20\",\n    show.legend = FALSE,\n  ) +\n  labs(\n    x = \"\",\n    y = expression(beta[\"SOR\"]),\n    fill = \"Componente\",\n    title = \"Partición de la diversidad beta\\n(índice de Sorensen)\"\n  ) +\n  theme_classic(base_size = 13) +\n  theme(\n    legend.position = \"bottom\",\n    panel.grid.major.x = element_blank(),\n    panel.grid.minor = element_blank(),\n    axis.text = element_text(color = \"black\")\n  )\nplot_pairs_sor\n\nEstos gráficos están basados en ggplot, así que es posible personalizarlos como cualquier otro gráfico de ggplot."
+  },
+  {
+    "objectID": "unidades/unidad_03.html#gráficos",
+    "href": "unidades/unidad_03.html#gráficos",
+    "title": "Unidad 03",
+    "section": "6.1 Gráficos",
+    "text": "6.1 Gráficos\n\n# Gráficos por tratamiento\nplot_ec &lt;- ggiNEXT(rarefaccion, type = 1, facet.var = \"Assemblage\") +\n  theme_classic(base_size = 10) +\n  theme(legend.position = \"bottom\")\nplot_ec\n\n# Gráficos por orden q\nplot_orderq &lt;- ggiNEXT(rarefaccion, type = 1, facet.var = \"Order.q\") +\n  theme_classic(base_size = 10) +\n  theme(legend.position = \"bottom\")\nplot_orderq"
+  },
+  {
+    "objectID": "unidades/unidad_03.html#gráficos-1",
+    "href": "unidades/unidad_03.html#gráficos-1",
+    "title": "Unidad 03",
+    "section": "7.1 Gráficos",
+    "text": "7.1 Gráficos\n\n# Creamos un data.frame con los resultados\npuntos_nmds &lt;- as.data.frame(resultado_nmds$points)\npuntos_nmds$CONSERVACION &lt;- ambiente$estado_conservacion\n\n# Agregamos siglas para nombres de los sitios y guardamos el valor de stress\npuntos_nmds$SITIO &lt;- abbreviate(rownames(abundancia))\nestres &lt;- paste(\"Stress =\", round(resultado_nmds$stress, 2))\n\n# Graficamos\nplot_nmds &lt;- ggplot(puntos_nmds, aes(x = MDS1, y = MDS2)) +\n  ggtitle(\"NMDS\") +\n  geom_point(aes(shape = CONSERVACION), size = 3) +\n  scale_shape_manual(\n    name = \"\",\n    breaks = c(\"ECB\", \"ECI\", \"ECD\"),\n    labels = c(\"Conservado\", \"Intermedio\", \"Degradado\"),\n    values = c(15, 16, 17)\n  ) +\n  geom_mark_hull(\n    aes(group = CONSERVACION, linetype = CONSERVACION),\n    concavity = 10,\n    radius = 0,\n    expand = 0,\n    show.legend = FALSE\n  ) +\n  scale_linetype_manual(values = c(\"solid\", \"dashed\", \"dotted\")) +\n  annotate(\"text\", x = +Inf, y = +Inf, label = estres, hjust = 1, vjust = 1) +\n  theme_classic()\nplot_nmds\n\n# Opcionalmente podemos añadir el nombre de los sitios\nplot_nmds +\n  geom_text_repel(\n    aes(label = SITIO),\n    box.padding = 0.5,\n    size = 3.5,\n    colour = \"blue\",\n  )"
+  },
+  {
+    "objectID": "unidades/unidad_01.html",
+    "href": "unidades/unidad_01.html",
+    "title": "Unidad 01",
+    "section": "",
+    "text": "En esta guía veremos como calcular distintos índices de diversidad alfa cómo Shannon, Simpson y diversidad verdadera. Así como estimadores: Chao, Jacknife, ACE e ICE. Se utilizaran los set de datos llamados abundancia_tratamiento.csv y abundancia_conservacion_larga.csv\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
+  },
+  {
+    "objectID": "unidades/unidad_01.html#ace-e-ice",
+    "href": "unidades/unidad_01.html#ace-e-ice",
+    "title": "Unidad 01",
+    "section": "4.1 ACE e ICE",
+    "text": "4.1 ACE e ICE\nEstas funciones del paquete fossil calculan los estimadores para todos los sitios, por lo tanto para calcularlos por grupo debemos hacerlo manualmente.\n\nace_ice &lt;- pivot_longer(\n  datos,\n  Acanthoponera.mucronata:Gnamptogenys.sulcata,\n  values_to = \"abund\"\n) %&gt;% \n  reframe(\n    .by = estadoConservacion,\n    ACE = fossil::ACE(abund),\n    ICE = fossil::ICE(abund)\n  ) %&gt;%\n  unique()\nace_ice"
+  },
+  {
+    "objectID": "unidades/unidad_02.html",
+    "href": "unidades/unidad_02.html",
+    "title": "Unidad 02",
+    "section": "",
+    "text": "En esta guí se verá como calcular indices de diversidad funcional y diversidad taxonómica. Se utilizaran los sets de datos llamados abun_hormigas.csv, categ_hormigas.csv, medidas_hormigas.csv, abundancia.csv y taxa.csv.\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
+  },
+  {
+    "objectID": "unidades/unidad_02.html#gráficos",
+    "href": "unidades/unidad_02.html#gráficos",
+    "title": "Unidad 02",
+    "section": "4.1 Gráficos",
+    "text": "4.1 Gráficos\n\n# Transformamos las tablas a formato largo para ggplot\ndiv_medidas_long  &lt;- tb_div_medidas %&gt;%\n  pivot_longer(\n    ECB:ECD,\n    names_to = \"Ambiente\",\n    values_to = \"val\"\n  ) %&gt;%\n  mutate(Ambiente = factor(Ambiente, levels = c(\"ECB\", \"ECI\", \"ECD\")))\n\ndiv_categs_long  &lt;- tb_div_categs %&gt;%\n  pivot_longer(\n    ECB:ECD,\n    names_to = \"Ambiente\",\n    values_to = \"val\"\n  ) %&gt;%\n  mutate(Ambiente = factor(Ambiente, levels = c(\"ECB\", \"ECI\", \"ECD\")))\n\n# Gráfico diversidad rasgos continuos\ndiv_medidas_plot &lt;- ggplot(div_medidas_long, aes(x = Ambiente, y = val, fill = Ambiente)) +\n  ylab(\"\") +\n  xlab(\"\") +\n  geom_col(show.legend = FALSE) +\n  scale_fill_manual(values = c(\"#20854E\", \"#E18727\", \"#BC3C29\")) +\n  scale_y_continuous(expand = c(0, 0)) +\n  facet_wrap(Index ~ ., scale = \"free\", axes = \"all\", ncol = 2, strip.position = \"left\") +\n  theme_classic() +\n  theme(strip.placement = \"outside\", strip.background = element_blank())\ndiv_medidas_plot\n\n#Gráfico diversidad rasgos categoricos\ndiv_categs_plot &lt;- ggplot(div_categs_long, aes(x = Ambiente, y = val, fill = Ambiente)) +\n  ylab(\"\") +\n  xlab(\"\") +\n  geom_col(show.legend = FALSE) +\n  scale_fill_manual(values = c(\"#20854E\", \"#E18727\", \"#BC3C29\")) +\n  scale_y_continuous(expand = c(0, 0)) +\n  facet_wrap(Index ~ ., scale = \"free\", axes = \"all\", ncol = 2, strip.position = \"left\") +\n  theme_classic() +\n  theme(strip.placement = \"outside\", strip.background = element_blank())\ndiv_categs_plot\n\n# Guardamos los gráficos\nggsave(\"graficos/diversidad_medidas.png\", div_medidas_plot, dpi = 300, width = 2000, height = 2000, units = \"px\")\nggsave(\"graficos/diversidad_categorias.png\", div_categs_plot, dpi = 300, width = 2000, height = 2000, units = \"px\")"
+  },
+  {
+    "objectID": "unidades/unidad_02.html#gráfico",
+    "href": "unidades/unidad_02.html#gráfico",
+    "title": "Unidad 02",
+    "section": "5.1 Gráfico",
+    "text": "5.1 Gráfico\n\n# Transdormamos los resultados a una data.frame\ndiv_taxonomica &lt;- as.data.frame(\n  do.call(cbind, div_taxonomica)\n)\n\ndiv_taxa_plot &lt;- ggplot(div_taxonomica, aes(x = Species, y = Dplus)) +\n  geom_point() +\n  ylab(\"Δ+\") +\n  xlab(\"Riqueza\") +\n  geom_hline(aes(yintercept = EDplus), linetype = \"dotted\") +\n  geom_ribbon(aes(ymax = EDplus + sd.Dplus * 2, ymin = EDplus - sd.Dplus * 2), fill = NA, color = \"black\") +\n  geom_text_repel(aes(label = row.names(div_taxonomica)), size = 3.5, color = \"blue3\") +\n  theme_classic()\ndiv_taxa_plot\nggsave(\"graficos/div_taxonomica.png\", div_taxa_plot, dpi = 300, width = 2000, height = 2000, units = \"px\")"
+  },
+  {
+    "objectID": "unidades/unidad_04.html",
+    "href": "unidades/unidad_04.html",
+    "title": "Unidad 04",
+    "section": "",
+    "text": "En esta guia veremos como realizar distintos análisis estadisticos utilizados para comprender como se relacionen variables ambientales con la estructura de la comunidad. Se utilizaran los sets de datos llamados moscas.csv, abundancia.csv, ambiente.csv y coordenadas.csv.\nNOTA: Es recomendable que trabajen dentro de un proyecto de RStudio."
+  },
+  {
+    "objectID": "unidades/unidad_04.html#gráfico",
+    "href": "unidades/unidad_04.html#gráfico",
+    "title": "Unidad 04",
+    "section": "5.1 Gráfico",
+    "text": "5.1 Gráfico\nPara graficar la salida de cca() no es posible hacerlo directamente con ggplot, por lo que primero debemos extraer los datos manualmente.\n\n# Gráficos base\nplot_cca &lt;- plot(resultado_cca)\nelipses_plot_cca &lt;- ordiellipse(resultado_cca, ambiente$estado_conservacion)\n\n# Extracción de datos para graficar\nsitios &lt;- scores(resultado_cca, display = \"sites\", scaling = 2) %&gt;%\n  as.data.frame() %&gt;%\n  rownames_to_column(\"label\")\n\nespecies &lt;- scores(resultado_cca, display = \"species\", scaling = 2) %&gt;%\n  as.data.frame() %&gt;%\n  rownames_to_column(\"label\")\n\nvectores &lt;- scores(resultado_cca, display = \"bp\", scaling = 2) %&gt;%\n  as.data.frame() %&gt;%\n  rownames_to_column(\"label\")\n\nelipses &lt;- ordiellipse.long(elipses_plot_cca)\ncolnames(elipses) &lt;- c(\"Grupo\", \"CCA1\", \"CCA2\")\n\nAhora si podemos gráficar usando ggplot.\n\n# Gráfico\n\nggplot(especies, aes(x = CCA1, y = CCA2)) +\n  geom_hline(yintercept = 0, linetype = \"dashed\", color = \"grey\") +\n  geom_vline(xintercept = 0, linetype = \"dashed\", color = \"grey\") +\n  geom_point(alpha = 0.5) +\n  geom_path(data = elipses, aes(color = Grupo)) +\n  geom_segment(\n    data = vectores,\n    aes(x = 0, y = 0, xend = CCA1*2, yend = CCA2*2),\n    arrow = arrow(length = unit(0.02, \"npc\")),\n    color = \"blue\"\n  ) +\n  geom_text_repel(\n    data = vectores,\n    aes(x = CCA1*2, y = CCA2*2, label = label),\n    color = \"blue\",\n    direction = \"y\"\n  ) +\n  theme_classic()"
+  },
+  {
+    "objectID": "unidades/unidad_04.html#gráfico-1",
+    "href": "unidades/unidad_04.html#gráfico-1",
+    "title": "Unidad 04",
+    "section": "6.1 Gráfico",
+    "text": "6.1 Gráfico\nPara visualizar los resultados del test de Mantel es posible hacer un gráfico de dispersión.\n\nplot(as.matrix(dist_geografica), as.matrix(dist_abundancia))\n\ndist_abund_vect &lt;- as.vector(dist_abundancia)\ndist_geo_vect &lt;- as.vector(dist_geografica)\n\npuntos_mantel &lt;- data.frame(\n  dist_abund = dist_abund_vect,\n  dist_geo = dist_geo_vect\n)\n\n# Distancias geográficas de 0 a 1\nmin_dist &lt;- min(puntos_mantel$dist_geo)\nmax_dist &lt;- max(puntos_mantel$dist_geo)\npuntos_mantel$geo_scaled &lt;- (puntos_mantel$dist_geo - min_dist) / (max_dist - min_dist)\n\nggplot(puntos_mantel, aes(x = geo_scaled, y = dist_abund)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = FALSE, color = \"blue\") +\n  labs(x = \"Distancia geográfica\", y = \"Distancia de abundancias\") +\n  coord_fixed() +\n  theme_classic()"
   }
 ]

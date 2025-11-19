@@ -6,15 +6,15 @@ website:
   navbar:
     left:
       - text: "Unidad 01"
-        href: unidad_01.qmd
+        href: ./unidades/unidad_01.qmd
       - text: "Unidad 02"
-        href: unidad_02.qmd
+        href: ./unidades/unidad_02.qmd
       - text: "Unidad 03"
-        href: unidad_03.qmd
+        href: ./unidades/unidad_03.qmd
       - text: "Unidad 04"
-        href: unidad_04.qmd
+        href: ./unidades/unidad_04.qmd
       - text: "Unidad 05"
-        href: unidad_05.qmd
+        href: ./unidades/unidad_05.qmd
 
 execute:
   output: false
@@ -22,7 +22,6 @@ execute:
   eval: false
 date: now
 date-format: YYYY
-pdf-engine: lualatex
 format:
   html:
     theme: cosmo
